@@ -46,8 +46,8 @@ Permite administrar ferias temáticas, gestionar inscripciones de emprendedores 
 ### 1. Clonar el repositorio
 
 ```bash
-git clone https://github.com/usuario/feriapp.git
-cd feriapp
+git clone https://github.com/alegrelias/feriapp-fork.git
+cd feriapp-fork
 ```
 
 ### 2. Crear y activar el entorno virtual
