@@ -35,7 +35,7 @@ Permite administrar ferias temáticas, gestionar inscripciones de emprendedores 
 
 | Nombre | Usuario GitHub |
 |--------|---------------|
-| ... | [@usuario](https://github.com/usuario) |
+| Elias N. Alegre | [@alegrelias](https://github.com/alegrelias) |
 | ... | [@usuario](https://github.com/usuario) |
 | ... | [@usuario](https://github.com/usuario) |
 
