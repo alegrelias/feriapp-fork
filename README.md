@@ -37,7 +37,7 @@ Permite administrar ferias temáticas, gestionar inscripciones de emprendedores 
 |--------|---------------|
 | Elias N. Alegre | [@alegrelias](https://github.com/alegrelias) |
 | Abigail D. Gómez | [@aby-gomez](https://github.com/aby-gomez) |
-| ... | [@usuario](https://github.com/usuario) |
+| Ricardo Iraola | [@Ricardo-Iraola](https://github.com/Ricardo-Iraola) |
 
 ---
 
