@@ -1,6 +1,6 @@
 # FeriApp 🏪
 
-Sistema web de gestión de ferias y emprendedores desarrollado con Django 5.1+.  
+Sistema web de gestión de ferias y emprendedores desarrollado con Django 5.1+.
 Permite administrar ferias temáticas, gestionar inscripciones de emprendedores y controlar la disponibilidad de puestos, con autenticación de usuarios y panel de administración.
 
 ---
@@ -38,6 +38,8 @@ Permite administrar ferias temáticas, gestionar inscripciones de emprendedores 
 | Elias N. Alegre | [@alegrelias](https://github.com/alegrelias) |
 | Abigail D. Gómez | [@aby-gomez](https://github.com/aby-gomez) |
 | Ricardo Iraola | [@Ricardo-Iraola](https://github.com/Ricardo-Iraola) |
+| Daniela A. Marchisoney | @UzumakiN314 (https://github.com/UzumakiN314) |
+
 
 ---
 
@@ -86,7 +88,7 @@ python manage.py createsuperuser
 python manage.py runserver
 ```
 
-Accedé a [http://localhost:8000](http://localhost:8000)  
+Accedé a [http://localhost:8000](http://localhost:8000)
 Panel admin: [http://localhost:8000/admin](http://localhost:8000/admin)
 
 ---
