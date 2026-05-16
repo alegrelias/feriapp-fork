@@ -3,9 +3,10 @@
 from __future__ import annotations
 
 from django.db import models
+from app.base_models import ValidableModel
 
 
-class Feria(models.Model):
+class Feria(ValidableModel):#<- ya no heredamos de models.Models sino de ValidableModel
     """Representa una feria con su período, ubicación y capacidad disponible."""
 
     nombre = models.CharField(max_length=200)
@@ -39,14 +40,20 @@ class Feria(models.Model):
         return self.puestos_disponibles() > 0
 
     @classmethod
-    def validate(
-        cls, nombre, categoria, fecha_inicio, fecha_fin, ubicacion, capacidad_puestos
-    ):
+    def validate(cls, **kwargs) -> list[str]:
         """
         Valida los datos de la feria. Retorna una lista de errores.
         Si la lista está vacía, los datos son válidos.
         """
         errors = []
+
+        # Extracción segura de los argumentos pasados por la vista o tests
+        nombre = kwargs.get('nombre', '').strip() if kwargs.get('nombre') else ''
+        categoria = kwargs.get('categoria', '').strip() if kwargs.get('categoria') else ''
+        ubicacion = kwargs.get('ubicacion', '').strip() if kwargs.get('ubicacion') else ''
+        capacidad_puestos = kwargs.get('capacidad_puestos')
+        fecha_inicio = kwargs.get('fecha_inicio')
+        fecha_fin = kwargs.get('fecha_fin')
 
         if not nombre or not nombre.strip():
             errors.append("El nombre es obligatorio.")
@@ -65,53 +72,95 @@ class Feria(models.Model):
 
         return errors
 
-    @classmethod
-    def new(
-        cls, nombre, categoria, fecha_inicio, fecha_fin, ubicacion, capacidad_puestos
-    ):
-        """
-        Crea y persiste una nueva feria si los datos son válidos.
-        Retorna (instancia, errors). Si hay errores, instancia es None.
-        """
-        errors = cls.validate(
-            nombre, categoria, fecha_inicio, fecha_fin, ubicacion, capacidad_puestos
-        )
-        if errors:
-            return None, errors
+    # =========================================================================
+    # NOTA PARA EL GRUPO: Los métodos 'new' y 'update' han sido comentados
+    # porque ahora se heredan de forma genérica y automatizada desde la 
+    # clase abstracta 'ValidableModel' (ubicada en app/base_models.py).
+    #
+    # Al heredar de ValidableModel, NINGUNO  necesita volver a 
+    # escribir 'new' ni 'update' en sus respectivos modelos (User, Inscripcion, etc).
+    # Solo debemos preocuparnos por escribir el método 'validate' de cada clase.
+    # =========================================================================
 
-        feria = cls.objects.create(
-            nombre=nombre.strip(),
-            categoria=categoria.strip(),
-            fecha_inicio=fecha_inicio,
-            fecha_fin=fecha_fin,
-            ubicacion=ubicacion.strip(),
-            capacidad_puestos=capacidad_puestos,
-        )
-        return feria, []
+    # @classmethod
+    # def new(cls, **kwargs):
+    #     """
+    #     YA NO ES NECESARIO: ValidableModel ya maneja este flujo:
+    #     1. Llama a cls.validate(**kwargs)
+    #     2. Si hay errores, retorna (None, errors)
+    #     3. Si está limpio, ejecuta cls.objects.create(**kwargs) y retorna (instancia, [])
+    #     """
+    #     pass
 
-    def update(
-        self, nombre, categoria, fecha_inicio, fecha_fin, ubicacion, capacidad_puestos
-    ):
-        """
-        Actualiza los datos de la feria si los datos son válidos.
-        Retorna una lista de errores. Si está vacía, la actualización fue exitosa.
-        """
-        errors = self.__class__.validate(
-            nombre, categoria, fecha_inicio, fecha_fin, ubicacion, capacidad_puestos
-        )
-        if errors:
-            return errors
+    # def update(self, **kwargs):
+    #     """
+    #     YA NO ES NECESARIO: ValidableModel ya maneja este flujo:
+    #     1. Llama a self.__class__.validate(**kwargs)
+    #     2. Si falla, frena y retorna los errores.
+    #     3. Si pasa, mapea los cambios con setattr() en memoria y ejecuta self.save()
+    #     """
+    #     pass
+    
+    # @classmethod
+    # def new(
+    #     cls, nombre, categoria, fecha_inicio, fecha_fin, ubicacion, capacidad_puestos
+    # ):
+    #     """
+    #     Crea y persiste una nueva feria si los datos son válidos.
+    #     Retorna (instancia, errors). Si hay errores, instancia es None.
+    #     """
+    #     errors = cls.validate(
+    #         nombre, categoria, fecha_inicio, fecha_fin, ubicacion, capacidad_puestos
+    #     )
+    #     if errors:
+    #         return None, errors
 
-        self.nombre = nombre.strip()
-        self.categoria = categoria.strip()
-        self.fecha_inicio = fecha_inicio
-        self.fecha_fin = fecha_fin
-        self.ubicacion = ubicacion.strip()
-        self.capacidad_puestos = capacidad_puestos
-        self.save()
-        return []
+    #     feria = cls.objects.create(
+    #         nombre=nombre.strip(),
+    #         categoria=categoria.strip(),
+    #         fecha_inicio=fecha_inicio,
+    #         fecha_fin=fecha_fin,
+    #         ubicacion=ubicacion.strip(),
+    #         capacidad_puestos=capacidad_puestos,
+    #     )
+    #     return feria, []
+
+    # def update(
+    #     self, nombre, categoria, fecha_inicio, fecha_fin, ubicacion, capacidad_puestos
+    # ):
+    #     """
+    #     Actualiza los datos de la feria si los datos son válidos.
+    #     Retorna una lista de errores. Si está vacía, la actualización fue exitosa.
+    #     """
+    #     errors = self.__class__.validate(
+    #         nombre, categoria, fecha_inicio, fecha_fin, ubicacion, capacidad_puestos
+    #     )
+    #     if errors:
+    #         return errors
+
+    #     self.nombre = nombre.strip()
+    #     self.categoria = categoria.strip()
+    #     self.fecha_inicio = fecha_inicio
+    #     self.fecha_fin = fecha_fin
+    #     self.ubicacion = ubicacion.strip()
+    #     self.capacidad_puestos = capacidad_puestos
+    #     self.save()
+    #     return []
 
     # TODO: Agregar los siguientes modelos:
     # class Categoria(models.Model): ...  ← extraer categoria a FK
     # class Emprendedor(models.Model): ...
     # class Inscripcion(models.Model): ...
+
+
+    # --- BLOQUE 1: Configuración de Usuarios (Elías) ---
+    # Aquí van  Emprendedor, Visitante, User (complejidad media-alta)
+
+    # --- BLOQUE 2: Estructura de Ferias (Persona B) ---
+    # Aquí van Categoria, Feria, Sector (complejidad media)
+
+    # --- BLOQUE 3: Transacciones (Persona C) ---
+    # Aquí va Inscripcion (dependencia con Emprendedor, Feria y Sector) (complejidad alta)
+
+    # --- BLOQUE 4: Feedback y Notificaciones (Persona D) ---
+    # Aquí van Resena(vincula Visistante con la Feria), Notificacion(cualquuier User con alertas de sistema) (complejidad media)
