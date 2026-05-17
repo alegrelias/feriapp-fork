@@ -4,6 +4,8 @@ from __future__ import annotations
 
 from django.db import models
 from app.base_models import ValidableModel
+#Importo esta clase que permite usar la clase "User" provista por Django
+from django.contrib.auth.models import User
 
 
 class Feria(ValidableModel):#<- ya no heredamos de models.Models sino de ValidableModel
@@ -156,6 +158,37 @@ class Feria(ValidableModel):#<- ya no heredamos de models.Models sino de Validab
     # --- BLOQUE 1: Configuración de Usuarios (Elías) ---
     # Aquí van  Emprendedor, Visitante, User (complejidad media-alta)
 
+
+class Emprendedor(ValidableModel):
+    nombre = models.CharField(max_length=200)
+    apellido = models.CharField(max_length=200)
+    email = models.EmailField(max_length=254, unique=True)
+    rubro = models.ForeignKey(Feria)
+    telefono = models.CharField(max_length=20, blank=True, null=True)
+    usuario = models.ForeignKey(User, on_delete=models.CASCADE)
+
+    def __str__(self):
+        """Retorna una representación legible del nombre del emprendedor"""
+        return self.nombre
+    
+
+    #TODO: 
+    # Visualización de inscripciones de un emprendedor
+    # Listado de emprendedores
+    # validate/new/update
+
+class Visitante(ValidableModel):
+    nombre = models.CharField(max_length=200)
+    apellido = models.CharField(max_length=200)
+    email = models.EmailField(max_length=254, unique=True)
+    usuario = models.ForeignKey(User, on_delete=models.CASCADE)
+    fecha_registro = models.DateField()
+
+    def __str__(self):
+        """Retorna una representación legible del nombre del visitante"""
+        return self.nombre
+
+
     # --- BLOQUE 2: Estructura de Ferias (Persona B) ---
     # Aquí van Categoria, Feria, Sector (complejidad media)
 
@@ -163,4 +196,10 @@ class Feria(ValidableModel):#<- ya no heredamos de models.Models sino de Validab
     # Aquí va Inscripcion (dependencia con Emprendedor, Feria y Sector) (complejidad alta)
 
     # --- BLOQUE 4: Feedback y Notificaciones (Persona D) ---
-    # Aquí van Reseña(vincula Visistante con la Feria), Notificacion(cualquuier User con alertas de sistema) (complejidad media)
+    # Aquí van Reseña(vincula Visistante con la Feria), Notificacion(cualquier User con alertas de sistema) (complejidad media)
+
+
+# NOTA DE ELIAS PARA LA CLASE NOTIFICACIONES:
+# Usen directamente como atributo dentro de la clase: usuarios = models.ManyToMany(User, related_name='notificaciones')
+# Django lee esa línea y automáticamente viaja a la clase User original y le "inyecta" un atributo dinámico llamado exactamente como se indica en tu related_name.
+# eso nos evita crear desde cero la clase User.
