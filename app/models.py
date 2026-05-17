@@ -159,6 +159,14 @@ class Feria(ValidableModel):#<- ya no heredamos de models.Models sino de Validab
     # Aquí van  Emprendedor, Visitante, User (complejidad media-alta)
 
 
+# Clase que nos permite manejar a los Emprendedores con los metodos que querramos
+class EmprendedorManager(models.Manager):
+    def listar_activos(self):
+        return self.get_queryset().order_by('apellido', 'nombre')
+    
+    # Ejemplo de uso:
+    # lista_emprendedores = Emprendedor.objects.listar_activos()
+
 class Emprendedor(ValidableModel):
     nombre = models.CharField(max_length=200)
     apellido = models.CharField(max_length=200)
@@ -166,15 +174,13 @@ class Emprendedor(ValidableModel):
     rubro = models.ForeignKey(Feria)
     telefono = models.CharField(max_length=20, blank=True, null=True)
     usuario = models.ForeignKey(User, on_delete=models.CASCADE)
+    objects = EmprendedorManager()
 
     def __str__(self):
         """Retorna una representación legible del nombre del emprendedor"""
         return self.nombre
     
-
-    #TODO: 
-    # Visualización de inscripciones de un emprendedor
-    # Listado de emprendedores
+    #TODO:
     # validate/new/update
 
 class Visitante(ValidableModel):
@@ -187,7 +193,9 @@ class Visitante(ValidableModel):
     def __str__(self):
         """Retorna una representación legible del nombre del visitante"""
         return self.nombre
-
+    
+    #TODO:
+    # validate/new/update
 
     # --- BLOQUE 2: Estructura de Ferias (Persona B) ---
     # Aquí van Categoria, Feria, Sector (complejidad media)
