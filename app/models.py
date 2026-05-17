@@ -192,7 +192,6 @@ class Emprendedor(ValidableModel):
         nombre = kwargs.get('nombre', '').strip() if kwargs.get('nombre') else ''
         apellido = kwargs.get('apellido', '').strip() if kwargs.get('apellido') else ''
         email = kwargs.get('email', '').strip() if kwargs.get('email') else ''
-        telefono = kwargs.get('telefono', '').strip() if kwargs.get('telefono') else ''
         
         # Extracción segura para Objetos/IDs (Foreign Keys): no se les puede hacer .strip()
         rubro = kwargs.get('rubro')
