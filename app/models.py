@@ -179,9 +179,42 @@ class Emprendedor(ValidableModel):
     def __str__(self):
         """Retorna una representación legible del nombre del emprendedor"""
         return self.nombre
-    
-    #TODO:
-    # validate/new/update
+
+    @classmethod
+    def validate(cls, **kwargs) -> list[str]:
+        """
+        Valida los datos del Emprendedor. Retorna una lista de errores.
+        Si la lista está vacía, los datos son válidos.
+        """
+        errors = []
+
+        # Extracción segura para textos: saca espacios en blanco extra y evita que sea 'None'
+        nombre = kwargs.get('nombre', '').strip() if kwargs.get('nombre') else ''
+        apellido = kwargs.get('apellido', '').strip() if kwargs.get('apellido') else ''
+        email = kwargs.get('email', '').strip() if kwargs.get('email') else ''
+        telefono = kwargs.get('telefono', '').strip() if kwargs.get('telefono') else ''
+        
+        # Extracción segura para Objetos/IDs (Foreign Keys): no se les puede hacer .strip()
+        rubro = kwargs.get('rubro')
+        usuario = kwargs.get('usuario')
+
+        # --- VALIDACIONES ---
+        if not nombre:
+            errors.append("El nombre es obligatorio.")
+
+        if not apellido:
+            errors.append("El apellido es obligatorio.")
+
+        if not email:
+            errors.append("El email es obligatorio.")
+
+        if rubro is None:
+            errors.append("El rubro es obligatorio.")
+
+        if usuario is None:
+            errors.append("El usuario es obligatorio.")
+
+        return errors
 
 class Visitante(ValidableModel):
     nombre = models.CharField(max_length=200)
@@ -194,8 +227,40 @@ class Visitante(ValidableModel):
         """Retorna una representación legible del nombre del visitante"""
         return self.nombre
     
-    #TODO:
-    # validate/new/update
+    @classmethod
+    def validate(cls, **kwargs) -> list[str]:
+        """
+        Valida los datos del visitante. Retorna una lista de errores.
+        Si la lista está vacía, los datos son válidos.
+        """
+        errors = []
+
+        # Extracción segura para textos: saca espacios en blanco extra y evita que sea 'None'
+        nombre = kwargs.get('nombre', '').strip() if kwargs.get('nombre') else ''
+        apellido = kwargs.get('apellido', '').strip() if kwargs.get('apellido') else ''
+        email = kwargs.get('email', '').strip() if kwargs.get('email') else ''
+        
+        # Extracción segura para Objetos/IDs (Foreign Keys): no se les puede hacer .strip()
+        fecha_registro = kwargs.get('fecha_registro')
+        usuario = kwargs.get('usuario')
+
+        # --- VALIDACIONES ---
+        if not nombre:
+            errors.append("El nombre es obligatorio.")
+
+        if not apellido:
+            errors.append("El apellido es obligatorio.")
+
+        if not email:
+            errors.append("El email es obligatorio.")
+
+        if fecha_registro is None:
+            errors.append("La fecha de registro es obligatoria.")
+
+        if usuario is None:
+            errors.append("El usuario es obligatorio.")
+
+        return errors
 
     # --- BLOQUE 2: Estructura de Ferias (Persona B) ---
     # Aquí van Categoria, Feria, Sector (complejidad media)
