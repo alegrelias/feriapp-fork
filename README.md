@@ -100,7 +100,7 @@ Panel admin: [http://localhost:8000/admin](http://localhost:8000/admin)
 python manage.py test -v 2
 
 # Solo tests de modelos
-python manage.py test ferias.tests.test_models -v 2
+python manage.py test app.tests.test_models -v 2
 
 # Solo tests de vistas
 python manage.py test ferias.tests.test_views -v 2
