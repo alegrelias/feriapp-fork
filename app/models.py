@@ -163,4 +163,4 @@ class Feria(ValidableModel):#<- ya no heredamos de models.Models sino de Validab
     # Aquí va Inscripcion (dependencia con Emprendedor, Feria y Sector) (complejidad alta)
 
     # --- BLOQUE 4: Feedback y Notificaciones (Persona D) ---
-    # Aquí van Resena(vincula Visistante con la Feria), Notificacion(cualquuier User con alertas de sistema) (complejidad media)
+    # Aquí van Reseña(vincula Visistante con la Feria), Notificacion(cualquuier User con alertas de sistema) (complejidad media)
