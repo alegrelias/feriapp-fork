@@ -171,7 +171,7 @@ class Emprendedor(ValidableModel):
     nombre = models.CharField(max_length=200)
     apellido = models.CharField(max_length=200)
     email = models.EmailField(max_length=254, unique=True)
-    rubro = models.ForeignKey(Feria)
+    rubro = models.ForeignKey(Feria, on_delete=models.CASCADE)
     telefono = models.CharField(max_length=20, blank=True, null=True)
     usuario = models.ForeignKey(User, on_delete=models.CASCADE)
     objects = EmprendedorManager()

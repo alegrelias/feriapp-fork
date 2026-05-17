@@ -4,7 +4,9 @@ from datetime import date
 
 from django.test import TestCase
 
-from app.models import Feria
+from django.contrib.auth.models import User
+
+from app.models import Feria, Emprendedor
 
 
 class FeriaModelTest(TestCase):
@@ -129,3 +131,50 @@ class FeriaModelTest(TestCase):
     # TODO: agregar tests para Emprendedor e Inscripcion cuando los implementen:
     # def test_tiene_lugar_false_cuando_llena(self): ...
     # def test_puestos_ocupados_cuenta_solo_confirmadas(self): ...
+class EmprendedorModelTest(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(
+            username="jhondoe", 
+            email="doejhon@gmail.com", 
+            password="password123"
+        )
+
+        self.feria = Feria.objects.create(
+            nombre="Feria de Invierno",
+            categoria="Artesanías",
+            fecha_inicio=date(2026, 7, 1),
+            fecha_fin=date(2026, 7, 3),
+            ubicacion="Plaza Central",
+            capacidad_puestos=10,
+        )
+
+        self.emprendedor = Emprendedor.objects.create(
+            nombre="Jhon",
+            apellido="Doe",
+            email="doejhon@gmail.com",
+            rubro=self.feria,
+            telefono="+54-2901 532133",
+            usuario=self.user
+        )
+
+    def test_str_retorna_nombre(self):
+        self.assertEqual(str(self.emprendedor), "Jhon")
+
+    def test_listar_activos_ordenados(self):
+        user2 = User.objects.create_user(
+            username="patricio",
+            email="estrella@gmail.com"
+        )
+
+        emprendedor_b = Emprendedor.objects.create(
+            nombre="Patricio",
+            apellido="Arenas", 
+            email="arenas@gmail.com",
+            rubro=self.feria,
+            telefono="+54-2901 999999",
+            usuario=user2
+        )
+
+        lista_activos = Emprendedor.objects.listar_activos()
+        self.assertEqual(lista_activos[0], self.emprendedor)
+        self.assertEqual(lista_activos[1], emprendedor_b)
