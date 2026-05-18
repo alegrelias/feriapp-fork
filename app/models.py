@@ -76,10 +76,10 @@ class Feria(ValidableModel):#<- ya no heredamos de models.Models sino de Validab
 
     # =========================================================================
     # NOTA PARA EL GRUPO: Los métodos 'new' y 'update' han sido comentados
-    # porque ahora se heredan de forma genérica y automatizada desde la 
+    # porque ahora se heredan de forma genérica y automatizada desde la
     # clase abstracta 'ValidableModel' (ubicada en app/base_models.py).
     #
-    # Al heredar de ValidableModel, NINGUNO  necesita volver a 
+    # Al heredar de ValidableModel, NINGUNO  necesita volver a
     # escribir 'new' ni 'update' en sus respectivos modelos (User, Inscripcion, etc).
     # Solo debemos preocuparnos por escribir el método 'validate' de cada clase.
     # =========================================================================
@@ -102,7 +102,7 @@ class Feria(ValidableModel):#<- ya no heredamos de models.Models sino de Validab
     #     3. Si pasa, mapea los cambios con setattr() en memoria y ejecuta self.save()
     #     """
     #     pass
-    
+
     # @classmethod
     # def new(
     #     cls, nombre, categoria, fecha_inicio, fecha_fin, ubicacion, capacidad_puestos
@@ -163,7 +163,7 @@ class Feria(ValidableModel):#<- ya no heredamos de models.Models sino de Validab
 class EmprendedorManager(models.Manager):
     def listar_activos(self):
         return self.get_queryset().order_by('apellido', 'nombre')
-    
+
     # Ejemplo de uso:
     # lista_emprendedores = Emprendedor.objects.listar_activos()
 
@@ -192,7 +192,7 @@ class Emprendedor(ValidableModel):
         nombre = kwargs.get('nombre', '').strip() if kwargs.get('nombre') else ''
         apellido = kwargs.get('apellido', '').strip() if kwargs.get('apellido') else ''
         email = kwargs.get('email', '').strip() if kwargs.get('email') else ''
-        
+
         # Extracción segura para Objetos/IDs (Foreign Keys): no se les puede hacer .strip()
         rubro = kwargs.get('rubro')
         usuario = kwargs.get('usuario')
@@ -225,7 +225,7 @@ class Visitante(ValidableModel):
     def __str__(self):
         """Retorna una representación legible del nombre del visitante"""
         return self.nombre
-    
+
     @classmethod
     def validate(cls, **kwargs) -> list[str]:
         """
@@ -238,7 +238,7 @@ class Visitante(ValidableModel):
         nombre = kwargs.get('nombre', '').strip() if kwargs.get('nombre') else ''
         apellido = kwargs.get('apellido', '').strip() if kwargs.get('apellido') else ''
         email = kwargs.get('email', '').strip() if kwargs.get('email') else ''
-        
+
         # Extracción segura para Objetos/IDs (Foreign Keys): no se les puede hacer .strip()
         fecha_registro = kwargs.get('fecha_registro')
         usuario = kwargs.get('usuario')
@@ -269,9 +269,96 @@ class Visitante(ValidableModel):
 
     # --- BLOQUE 4: Feedback y Notificaciones (Persona D) ---
     # Aquí van Reseña(vincula Visistante con la Feria), Notificacion(cualquier User con alertas de sistema) (complejidad media)
+class Resenia(ValidableModel):
+
+    visitante = models.ForeignKey(Visitante, on_delete=models.CASCADE, related_name='resenias')
+    feria = models.ForeignKey(Feria, on_delete=models.CASCADE, related_name='resenias')
+    calificacion = models.PositiveIntegerField()
+    comentario = models.TextField(blank=True, null=True)
+    fecha_resenia = models.DateField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-fecha_resenia']
+
+    def __str__(self):
+        """Retorna una representación legible de la reseña"""
+        return f"Reseña de {self.visitante.nombre} para {self.feria.nombre} ({self.calificacion}*)"
+
+    @classmethod
+    def validate(cls, **kwargs) -> list[str]:
+        """
+        Valida los datos de la reseña. Retorna una lista de errores.
+        Si la lista está vacía, los datos son válidos.
+        """
+        errors = []
+
+        # Extracción segura para textos: saca espacios en blanco extra y evita que sea 'None'
+        comentario = kwargs.get('comentario', '').strip() if kwargs.get('comentario') else ''
+
+        # Extracción segura para Objetos/IDs (Foreign Keys): no se les puede hacer .strip()
+        visitante = kwargs.get('visitante')
+        feria = kwargs.get('feria')
+        calificacion = kwargs.get('calificacion')
+        comentario = kwargs.get('comentario', '').strip() if kwargs.get('comentario') else ''
+
+        # --- VALIDACIONES ---
+        if visitante is None:
+            errors.append("El visitante es obligatorio.")
+
+        if feria is None:
+            errors.append("La feria es obligatoria.")
+
+        if calificacion is None or not (1 <= calificacion <= 5):
+            errors.append("La calificación debe ser un número entre 1 y 5.")
+
+        return errors
+
+class Notificacion(ValidableModel):
+    usuarios = models.ManyToManyField(User, related_name='notificaciones')
+    titulo = models.CharField(max_length=100)
+    mensaje = models.CharField(max_length=255)
+    fecha_notificacion = models.DateTimeField(auto_now_add=True)
+    leida = models.BooleanField(default=False)
+
+    class Meta:
+        ordering = ['-fecha_notificacion']
+
+    def __str__(self):
+        """Retorna una representación legible de la notificación"""
+        return f"Notificación: {self.titulo} - {self.mensaje[:30]}..."
+
+    @classmethod
+    def validate(cls, **kwargs) -> list[str]:
+        """
+        Valida los datos de la notificación. Retorna una lista de errores.
+        Si la lista está vacía, los datos son válidos.
+        """
+        errors = []
+
+        # Extracción segura para textos: saca espacios en blanco extra y evita que sea 'None'
+        titulo = kwargs.get('titulo', '').strip() if kwargs.get('titulo') else ''
+        mensaje = kwargs.get('mensaje', '').strip() if kwargs.get('mensaje') else ''
+
+        # Extracción segura para Objetos/IDs (Foreign Keys): no se les puede hacer .strip()
+        usuarios = kwargs.get('usuarios')
+
+        # --- VALIDACIONES ---
+        if not titulo:
+            errors.append("El título es obligatorio.")
+
+        if not mensaje:
+            errors.append("El mensaje es obligatorio.")
+
+        if not usuarios:
+            errors.append("Debe haber al menos un usuario destinatario.")
+
+        return errors
 
 
 # NOTA DE ELIAS PARA LA CLASE NOTIFICACIONES:
 # Usen directamente como atributo dentro de la clase: usuarios = models.ManyToMany(User, related_name='notificaciones')
 # Django lee esa línea y automáticamente viaja a la clase User original y le "inyecta" un atributo dinámico llamado exactamente como se indica en tu related_name.
 # eso nos evita crear desde cero la clase User.
+
+# NOTA DE DANIELA PARA LA CLASE RESENIA:
+# unique_together = ('visitante', 'feria') // deberia ir esto para asegurar que no haya dos reseñas del mismo visitante para la misma feria?, pero lo dejo comentado por ahora para no complicar el desarrollo inicial.
