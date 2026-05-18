@@ -84,6 +84,10 @@ class FeriaModelTest(TestCase):
 
     def setUp(self):
         """Crea una feria base reutilizable para cada caso de prueba."""
+        self.categoria = Categoria.objects.create(
+            nombre="Artesanías",
+            descripcion="Ferias artesanales"
+        )
         self.feria = Feria.objects.create(
             nombre="Feria de Invierno",
             categoria=self.categoria,
@@ -92,11 +96,7 @@ class FeriaModelTest(TestCase):
             ubicacion="Plaza Central",
             capacidad_puestos=10,
         )
-        self.categoria = Categoria.objects.create(
-            nombre="Artesanías",
-            descripcion="Ferias artesanales"
-        )
-
+        
     # --- __str__ y métodos simples ---
 
     def test_str_retorna_nombre(self):
@@ -201,7 +201,7 @@ class FeriaModelTest(TestCase):
         count_antes = Feria.objects.count()
         feria, errors = Feria.new(
             nombre="",
-            categoria="",
+            categoria=None,
             fecha_inicio=None,
             fecha_fin=None,
             ubicacion="",
@@ -230,7 +230,7 @@ class FeriaModelTest(TestCase):
     def test_update_con_datos_invalidos_no_modifica(self):
         errors = self.feria.update(
             nombre="",
-            categoria="",
+            categoria=None,
             fecha_inicio=None,
             fecha_fin=None,
             ubicacion="",
@@ -379,9 +379,14 @@ class EmprendedorModelTest(TestCase):
             password="password123"
         )
 
+        self.categoria = Categoria.objects.create(
+            nombre="Artesanías",
+            descripcion="Ferias artesanales"
+        )
+
         self.feria = Feria.objects.create(
             nombre="Feria de Invierno",
-            categoria="Artesanías",
+            categoria=self.categoria,
             fecha_inicio=date(2026, 7, 1),
             fecha_fin=date(2026, 7, 3),
             ubicacion="Plaza Central",
