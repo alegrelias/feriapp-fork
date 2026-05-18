@@ -6,8 +6,78 @@ from django.test import TestCase
 
 from django.contrib.auth.models import User
 
-from app.models import Feria, Emprendedor, Visitante
+from app.models import Categoria, Feria, Sector, Emprendedor, Visitante
 
+
+class CategoriaModelTest(TestCase):
+
+    def test_validate_datos_correctos_retorna_lista_vacia(self):
+
+        errors = Categoria.validate(
+            nombre="Tecnologia",
+            descripcion="Ferias tecnológicas"
+        )
+
+        self.assertEqual(errors, [])
+
+    def test_validate_nombre_vacio_retorna_error(self):
+
+        errors = Categoria.validate(
+            nombre="",
+            descripcion="Desc"
+        )
+
+        self.assertTrue(len(errors) > 0)
+
+    def test_validate_nombre_corto_retorna_error(self):
+
+        errors = Categoria.validate(
+            nombre="AB",
+            descripcion="Desc"
+        )
+
+        self.assertTrue(len(errors) > 0)
+
+    def test_validate_descripcion_vacia_retorna_error(self):
+
+        errors = Categoria.validate(
+            nombre="Tecnologia",
+            descripcion=""
+        )
+
+        self.assertTrue(len(errors) > 0)
+
+    def test_new_crea_categoria(self):
+
+        categoria, errors = Categoria.new(
+            nombre="Gaming",
+            descripcion="Eventos gaming"
+        )
+
+        self.assertEqual(errors, [])
+
+        self.assertIsNotNone(categoria)
+
+    def test_update_modifica_categoria(self):
+
+        categoria = Categoria.objects.create(
+            nombre="Old",
+            descripcion="Desc"
+        )
+
+        errors = categoria.update(
+            nombre="Nueva",
+            descripcion="Nueva descripcion"
+        )
+
+        self.assertEqual(errors, [])
+
+        categoria.refresh_from_db()
+
+        self.assertEqual(
+            categoria.nombre,
+            "Nueva"
+        )
 
 class FeriaModelTest(TestCase):
     """Verifica validaciones y operaciones básicas del modelo Feria."""
@@ -16,11 +86,15 @@ class FeriaModelTest(TestCase):
         """Crea una feria base reutilizable para cada caso de prueba."""
         self.feria = Feria.objects.create(
             nombre="Feria de Invierno",
-            categoria="Artesanías",
+            categoria=self.categoria,
             fecha_inicio=date(2026, 7, 1),
             fecha_fin=date(2026, 7, 3),
             ubicacion="Plaza Central",
             capacidad_puestos=10,
+        )
+        self.categoria = Categoria.objects.create(
+            nombre="Artesanías",
+            descripcion="Ferias artesanales"
         )
 
     # --- __str__ y métodos simples ---
@@ -42,7 +116,7 @@ class FeriaModelTest(TestCase):
     def test_validate_datos_correctos_retorna_lista_vacia(self):
         errors = Feria.validate(
             nombre="Tech Patagonia",
-            categoria="Tecnología",
+            categoria=self.categoria,
             fecha_inicio=date(2026, 9, 1),
             fecha_fin=date(2026, 9, 3),
             ubicacion="Centro Cultural",
@@ -53,7 +127,7 @@ class FeriaModelTest(TestCase):
     def test_validate_nombre_vacio_retorna_error(self):
         errors = Feria.validate(
             nombre="",
-            categoria="Tecnología",
+            categoria=self.categoria,
             fecha_inicio=date(2026, 9, 1),
             fecha_fin=date(2026, 9, 3),
             ubicacion="Centro Cultural",
@@ -64,7 +138,7 @@ class FeriaModelTest(TestCase):
     def test_validate_fecha_fin_anterior_a_inicio_retorna_error(self):
         errors = Feria.validate(
             nombre="Tech Patagonia",
-            categoria="Tecnología",
+            categoria=self.categoria,
             fecha_inicio=date(2026, 9, 10),
             fecha_fin=date(2026, 9, 5), # fin < inicio
             ubicacion="Centro Cultural",
@@ -75,7 +149,7 @@ class FeriaModelTest(TestCase):
     def test_validate_capacidad_cero_retorna_error(self):
         errors = Feria.validate(
             nombre="Tech Patagonia",
-            categoria="Tecnología",
+            categoria=self.categoria,
             fecha_inicio=date(2026, 9, 1),
             fecha_fin=date(2026, 9, 3),
             ubicacion="Centro Cultural",
@@ -83,12 +157,36 @@ class FeriaModelTest(TestCase):
         )
         self.assertTrue(len(errors) > 0)
 
+    def test_validate_categoria_none_retorna_error(self):
+
+        errors = Feria.validate(
+        nombre="Tech",
+        categoria=None,
+        fecha_inicio=date(2026, 9, 1),
+        fecha_fin=date(2026, 9, 3),
+        ubicacion="Centro",
+        capacidad_puestos=10
+        )
+        self.assertTrue(len(errors) > 0)
+
+    def test_validate_ubicacion_vacia_retorna_error(self):
+
+        errors = Feria.validate(
+        nombre="Tech",
+        categoria=self.categoria,
+        fecha_inicio=date(2026, 9, 1),
+        fecha_fin=date(2026, 9, 10),
+        ubicacion="",
+        capacidad_puestos=10
+        )
+        self.assertTrue(len(errors) > 0)    
+
     # --- new ---
 
     def test_new_crea_feria_con_datos_validos(self):
         feria, errors = Feria.new(
             nombre="Mercado de Diseño",
-            categoria="Artesanías",
+            categoria=self.categoria,
             fecha_inicio=date(2026, 9, 1),
             fecha_fin=date(2026, 9, 3),
             ubicacion="Muelle Turístico",
@@ -118,7 +216,7 @@ class FeriaModelTest(TestCase):
     def test_update_modifica_datos_correctamente(self):
         errors = self.feria.update(
             nombre="Feria de Invierno",
-            categoria="Artesanías",
+            categoria=self.categoria,
             fecha_inicio=date(2026, 9, 1),
             fecha_fin=date(2026, 9, 3),
             ubicacion="Parque Central",
@@ -141,6 +239,132 @@ class FeriaModelTest(TestCase):
         self.assertTrue(len(errors) > 0)
         self.feria.refresh_from_db()
         self.assertEqual(self.feria.nombre, "Feria de Invierno")  # sin cambios
+
+class SectorModelTest(TestCase):
+
+    def setUp(self):
+
+        self.categoria = Categoria.objects.create(
+            nombre="Tecnologia",
+            descripcion="Desc"
+        )
+
+        self.feria = Feria.objects.create(
+            nombre="Feria Tech",
+            categoria=self.categoria,
+            fecha_inicio=date(2026, 9, 1),
+            fecha_fin=date(2026, 9, 10),
+            ubicacion="Ushuaia",
+            capacidad_puestos=20
+        )
+
+    def test_validate_datos_correctos(self):
+
+        errors = Sector.validate(
+            nombre="Sector A",
+            feria=self.feria,
+            edicion=1,
+            capacidad_puestos=10
+        )
+
+        self.assertEqual(errors, [])
+
+    def test_validate_nombre_vacio(self):
+
+        errors = Sector.validate(
+            nombre="",
+            feria=self.feria,
+            edicion=1,
+            capacidad_puestos=10
+        )
+
+        self.assertTrue(len(errors) > 0)
+
+    def test_validate_feria_none(self):
+
+        errors = Sector.validate(
+            nombre="Sector A",
+            feria=None,
+            edicion=1,
+            capacidad_puestos=10
+        )
+
+        self.assertTrue(len(errors) > 0)
+
+    def test_validate_edicion_invalida(self):
+
+        errors = Sector.validate(
+            nombre="Sector A",
+            feria=self.feria,
+            edicion=0,
+            capacidad_puestos=10
+        )
+
+        self.assertTrue(len(errors) > 0)
+
+    def test_validate_capacidad_invalida(self):
+
+        errors = Sector.validate(
+            nombre="Sector A",
+            feria=self.feria,
+            edicion=1,
+            capacidad_puestos=0
+        )
+
+        self.assertTrue(len(errors) > 0)
+
+    def test_new_crea_sector(self):
+
+        sector, errors = Sector.new(
+            feria=self.feria,
+            edicion=1,
+            nombre="Sector Norte",
+            capacidad_puestos=15,
+            tiene_conexion_electrica=True
+        )
+
+        self.assertEqual(errors, [])
+
+        self.assertIsNotNone(sector)
+
+    def test_update_modifica_sector(self):
+
+        sector = Sector.objects.create(
+            feria=self.feria,
+            edicion=1,
+            nombre="Sector A",
+            capacidad_puestos=10
+        )
+
+        errors = sector.update(
+            feria=self.feria,
+            edicion=2,
+            nombre="Sector B",
+            capacidad_puestos=20,
+            tiene_conexion_electrica=True
+        )
+
+        self.assertEqual(errors, [])
+
+        sector.refresh_from_db()
+
+        self.assertEqual(
+            sector.nombre,
+            "Sector B"
+        )
+
+    def test_hay_lugar(self):
+
+        sector = Sector.objects.create(
+            feria=self.feria,
+            edicion=1,
+            nombre="Sector A",
+            capacidad_puestos=5
+        )
+
+        self.assertTrue(
+            sector.hay_lugar()
+        )
 
     # TODO: agregar tests para Inscripcion cuando lo implementen:
     # def test_tiene_lugar_false_cuando_llena(self): ...
