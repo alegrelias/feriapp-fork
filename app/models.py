@@ -7,12 +7,48 @@ from app.base_models import ValidableModel
 #Importo esta clase que permite usar la clase "User" provista por Django
 from django.contrib.auth.models import User
 
+class Categoria(ValidableModel):
+    """Representa una categoría de feria."""
+
+    nombre = models.CharField(max_length=100,unique=True)
+    descripcion = models.TextField()
+
+    class Meta:
+        ordering = ["nombre"]
+
+    def __str__(self):
+
+        return self.nombre
+
+    def cantidad_ferias(self):
+        """Retorna la cantidad de ferias asociadas."""
+
+        return self.ferias.count()
+
+    @classmethod
+    def validate(cls, **kwargs) -> list[str]:
+
+        errors = []
+
+        nombre = (kwargs.get("nombre", "").strip() if kwargs.get("nombre") else "")
+        descripcion = (kwargs.get("descripcion", "").strip() if kwargs.get("descripcion") else "")
+
+        if not nombre:
+            errors.append("El nombre es obligatorio.")
+
+        if len(nombre) < 3:
+            errors.append("El nombre debe tener al menos 3 caracteres.")
+
+        if not descripcion:
+            errors.append("La descripción es obligatoria.")
+
+        return errors
 
 class Feria(ValidableModel):#<- ya no heredamos de models.Models sino de ValidableModel
     """Representa una feria con su período, ubicación y capacidad disponible."""
 
     nombre = models.CharField(max_length=200)
-    categoria = models.CharField(max_length=100)
+    categoria = models.ForeignKey(Categoria, on_delete=models.CASCADE, related_name="ferias", null=True, blank=True)
     fecha_inicio = models.DateField()
     fecha_fin = models.DateField()
     ubicacion = models.CharField(max_length=200)
@@ -24,53 +60,107 @@ class Feria(ValidableModel):#<- ya no heredamos de models.Models sino de Validab
 
     def __str__(self):
         """Retorna una representación legible de la feria."""
+
         return self.nombre
 
     def puestos_ocupados(self):
         """Retorna la cantidad de inscripciones confirmadas."""
-        # Mientras Inscripcion no exista, no hay relaciones para contar.
-        if not hasattr(self, "inscripcion_set"):
-            return 0
-        return self.inscripcion_set.filter(estado="confirmada").count()
+
+        return 0
 
     def puestos_disponibles(self):
         """Retorna los puestos libres."""
-        return self.capacidad_puestos - self.puestos_ocupados()
+
+        return (self.capacidad_puestos - self.puestos_ocupados())
 
     def tiene_lugar(self):
         """Retorna True si quedan puestos disponibles."""
+
         return self.puestos_disponibles() > 0
+
+    def cantidad_sectores(self):
+        """Retorna la cantidad de sectores asociados."""
+
+        return self.sectores.count()
 
     @classmethod
     def validate(cls, **kwargs) -> list[str]:
-        """
-        Valida los datos de la feria. Retorna una lista de errores.
-        Si la lista está vacía, los datos son válidos.
-        """
+        """Valida los datos de la feria. Retorna una lista de errores."""
+
         errors = []
 
-        # Extracción segura de los argumentos pasados por la vista o tests
-        nombre = kwargs.get('nombre', '').strip() if kwargs.get('nombre') else ''
-        categoria = kwargs.get('categoria', '').strip() if kwargs.get('categoria') else ''
-        ubicacion = kwargs.get('ubicacion', '').strip() if kwargs.get('ubicacion') else ''
-        capacidad_puestos = kwargs.get('capacidad_puestos')
-        fecha_inicio = kwargs.get('fecha_inicio')
-        fecha_fin = kwargs.get('fecha_fin')
+        nombre = (kwargs.get("nombre", "").strip() if kwargs.get("nombre") else "")
+        ubicacion = (kwargs.get("ubicacion", "").strip() if kwargs.get("ubicacion") else "")
+        categoria = kwargs.get("categoria")
+        capacidad_puestos = kwargs.get("capacidad_puestos")
+        fecha_inicio = kwargs.get("fecha_inicio")
+        fecha_fin = kwargs.get("fecha_fin")
 
-        if not nombre or not nombre.strip():
+        if not nombre:
             errors.append("El nombre es obligatorio.")
 
-        if not categoria or not categoria.strip():
+        if categoria is None:
             errors.append("La categoría es obligatoria.")
 
-        if not ubicacion or not ubicacion.strip():
+        if not ubicacion:
             errors.append("La ubicación es obligatoria.")
 
-        if capacidad_puestos is None or capacidad_puestos <= 0:
+        if (capacidad_puestos is None or capacidad_puestos <= 0):
             errors.append("La capacidad de puestos debe ser mayor a cero.")
 
-        if fecha_inicio and fecha_fin and fecha_fin < fecha_inicio:
+        if (fecha_inicio and fecha_fin and fecha_fin < fecha_inicio):
             errors.append("La fecha de fin no puede ser anterior a la fecha de inicio.")
+
+        return errors
+    
+class Sector(ValidableModel):
+    """Representa un sector dentro de una feria."""
+
+    feria = models.ForeignKey(Feria, on_delete=models.CASCADE, related_name="sectores")
+    edicion = models.PositiveIntegerField()
+    nombre = models.CharField(max_length=100)
+    capacidad_puestos = models.PositiveIntegerField()
+    tiene_conexion_electrica = models.BooleanField(default=False)
+
+    class Meta:
+        ordering = ["nombre"]
+
+    def __str__(self):
+
+        return (
+            f"{self.nombre} - "
+            f"{self.feria.nombre}"
+        )
+
+    def hay_lugar(self):
+        """Retorna True si el sector posee capacidad."""
+
+        return self.capacidad_puestos > 0
+
+    @classmethod
+    def validate(cls, **kwargs) -> list[str]:
+
+        errors = []
+
+        nombre = (kwargs.get("nombre", "").strip() if kwargs.get("nombre") else "")
+        feria = kwargs.get("feria")
+        edicion = kwargs.get("edicion")
+        capacidad_puestos = kwargs.get("capacidad_puestos")
+
+        if not nombre:
+            errors.append("El nombre es obligatorio.")
+        
+        if len(nombre) < 2: 
+            errors.append("El nombre debe tener al menos 2 caracteres.")
+
+        if feria is None:
+            errors.append("La feria es obligatoria.")
+
+        if (edicion is None or edicion <= 0):
+            errors.append("La edición debe ser mayor a cero.")
+
+        if (capacidad_puestos is None or capacidad_puestos <= 0):
+            errors.append("La capacidad debe ser mayor a cero.")
 
         return errors
 
@@ -260,9 +350,6 @@ class Visitante(ValidableModel):
             errors.append("El usuario es obligatorio.")
 
         return errors
-
-    # --- BLOQUE 2: Estructura de Ferias (Persona B) ---
-    # Aquí van Categoria, Feria, Sector (complejidad media)
 
     # --- BLOQUE 3: Transacciones (Persona C) ---
     # Aquí va Inscripcion (dependencia con Emprendedor, Feria y Sector) (complejidad alta)
