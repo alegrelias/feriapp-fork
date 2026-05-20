@@ -354,6 +354,17 @@ class Visitante(ValidableModel):
     # --- BLOQUE 3: Transacciones (Persona C) ---
     # Aquí va Inscripcion (dependencia con Emprendedor, Feria y Sector) (complejidad alta)
 
+    class Inscripcion(ValidableModel):
+        emprendedor = models.ForeignKey(Feria, on_delete= models.CASCADE, related_name='inscripciones')
+
+        #que pasa si feria se borra?, null y blank quedan por defecto en false si no se colocan
+        feria = models.ForeignKey(Feria, on_delete= models.CASCADE, related_name='inscripciones')
+        numero_puesto = models.IntegerField(null=True, blank=True)
+        #se le asigna la fecha cuando fue guardada en e servidor, no se puede modificar
+        fecha_inscripcion= models.DateField(auto_now_add=True)
+        estado = models.CharField(max_length=20, choices={'Pendiente','Aceptada','Rechazada'} , default='Pendiente')
+        registrado_por = models.CharField(max_length=100, )
+
     # --- BLOQUE 4: Feedback y Notificaciones (Persona D) ---
     # Aquí van Reseña(vincula Visistante con la Feria), Notificacion(cualquier User con alertas de sistema) (complejidad media)
 
