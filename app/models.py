@@ -351,19 +351,104 @@ class Visitante(ValidableModel):
 
         return errors
 
-    # --- BLOQUE 3: Transacciones (Persona C) ---
+    # --- BLOQUE 3: Transacciones (Aby) ---
     # Aquí va Inscripcion (dependencia con Emprendedor, Feria y Sector) (complejidad alta)
+    
+    #  El Manager solo se encarga de las consultas de conjuntos (QuerySets), maneja la TABLA, las de objetos van como metodo de instancia
+class InscripcionManager(models.Manager):
+    #get_queryset() no lo sobrescribo, por ende hereda el de Django que trae TODO.
 
-    class Inscripcion(ValidableModel):
-        emprendedor = models.ForeignKey(Feria, on_delete= models.CASCADE, related_name='inscripciones')
-
+    def listar_activos(self):
+        #'emprendedor__apellido' iajá a la tabla relacionada mediante la clave foránea emprendedor y ordená usando la columna apellido de esa otra tabla
+        return self.get_queryset().filter(estado='Confirmada').order_by('emprendedor__apellido', 'emprendedor__nombre')
+        
+        
+            
+class Inscripcion(ValidableModel):
+        
+        emprendedor = models.ForeignKey(Emprendedor, on_delete= models.CASCADE, related_name='inscripciones_emprendedor')
         #que pasa si feria se borra?, null y blank quedan por defecto en false si no se colocan
-        feria = models.ForeignKey(Feria, on_delete= models.CASCADE, related_name='inscripciones')
+        feria = models.ForeignKey(Feria, on_delete= models.CASCADE, related_name='inscripciones_feria')
         numero_puesto = models.IntegerField(null=True, blank=True)
-        #se le asigna la fecha cuando fue guardada en e servidor, no se puede modificar
+        #se le asigna la fecha cuando fue guardada en el servidor, no se puede modificar
         fecha_inscripcion= models.DateField(auto_now_add=True)
-        estado = models.CharField(max_length=20, choices={'Pendiente','Aceptada','Rechazada'} , default='Pendiente')
-        registrado_por = models.CharField(max_length=100, )
+        #debe ser lista de tuplas en choices
+        ESTADOS_CHOICES = [
+        ('Confirmada', 'Confirmada'),
+        ('Lista_espera', 'Lista_espera'),
+        ('Cancelada', 'Cancelada'), 
+    ]
+        estado = models.CharField(max_length=20, choices=ESTADOS_CHOICES , default='Lista_espera')
+        registrado_por = models.CharField(max_length=100)
+        
+        #vinculo el manager
+        objects = InscripcionManager()
+        class Meta:
+            #para el panel de admin
+            verbose_name_plural = "Inscripciones"
+            ordering = ["fecha_inscripcion"]
+
+        def __str__(self):
+            #django detecta que quiero acceder al objeto completo de emprendedor, no solo el numero asi que hace join de las tablas y me trae el nombre
+            return f"Inscripción {self.id} - {self.emprendedor}"
+
+        def cancelar_inscripcion(self):
+
+            self.estado = 'Cancelada'
+            self.save()
+
+        @classmethod
+        def validate(cls, **kwargs) -> list[str]:
+        # si se llegara a agregar alguna validacion en la clase madre la ejecuta
+            errors = super().validate(**kwargs)
+
+            #si no hay parametro emprendedor, devuelvo un None
+            emprendedor = kwargs.get("emprendedor",None)
+            #si es texto le saco los espacios
+            if isinstance(emprendedor,str):
+                emprendedor= emprendedor.strip()
+            #si hay cadena vacia o None entra al error
+            if not emprendedor :
+                errors.append("Es obligatorio indicar el emprendedor que solicita la inscripcion")
+            
+            feria = kwargs.get("feria",None)    
+            if isinstance(feria,str):
+                feria= feria.strip()
+            #si hay cadena vacia o None entra al error
+            if not feria :
+                errors.append("Es obligatorio indicar en que feria se solicita la inscripcion")
+            
+            numero_puesto = kwargs.get("numero_puesto", None)
+            estado_enviado = kwargs.get("estado", None)
+            estado_efectivo = estado_enviado or "Lista_espera"
+
+            if numero_puesto is not None:
+                # Validar que sea un número válido
+                if int(numero_puesto) <= 0:
+                    errors.append("El número de puesto debe ser un entero positivo.")
+                
+                # Validar consistencia con el estado
+                if estado_enviado is None:
+                    # Caso A: El usuario no especificó estado pero metió un número de puesto
+                  errors.append("No se puede asignar un número de puesto si la inscripción no está en estado 'Confirmada'.")
+                elif estado_efectivo in ["Lista_espera", "Cancelada"]:
+                    # Caso B: El usuario explícitamente eligió un estado inválido para tener puesto
+                    errors.append(f"No se puede asignar un número de puesto a una inscripción con estado '{estado_efectivo}'.")
+                    
+            if estado_efectivo == "Confirmada" and not numero_puesto:
+                errors.append("Las inscripciones aceptadas deben tener un número de puesto asignado.")
+            
+            registrado_por = kwargs.get("registrado_por", "")
+            if isinstance(registrado_por, str):
+                registrado_por = registrado_por.strip()
+
+            if not registrado_por:
+                errors.append("Debe especificarse el usuario que registra esta inscripción.")
+
+
+            return errors
+             
+
 
     # --- BLOQUE 4: Feedback y Notificaciones (Persona D) ---
     # Aquí van Reseña(vincula Visistante con la Feria), Notificacion(cualquier User con alertas de sistema) (complejidad media)
