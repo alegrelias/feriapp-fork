@@ -42,6 +42,7 @@ class ValidableModel(models.Model):
         if errors:
             return errors
 
+
         # Setea dinámicamente los campos nuevos pasados por la vista
         for key, value in kwargs.items():
             setattr(self, key, value)

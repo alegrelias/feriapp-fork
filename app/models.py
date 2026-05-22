@@ -362,7 +362,7 @@ class InscripcionManager(models.Manager):
         #'emprendedor__apellido' iajá a la tabla relacionada mediante la clave foránea emprendedor y ordená usando la columna apellido de esa otra tabla
         return self.get_queryset().filter(estado='Confirmada').order_by('emprendedor__apellido', 'emprendedor__nombre')
         
-        
+  
             
 class Inscripcion(ValidableModel):
         
@@ -398,6 +398,28 @@ class Inscripcion(ValidableModel):
             self.save()
 
         @classmethod
+        def existe_puesto(cls, feria, numero_puesto, instancia_id=None) -> bool:
+            """
+            Consulta la BD para ver si el puesto ya está ocupado 
+            en esa feria específica por otra inscripción confirmada.
+            """
+            if not feria or not numero_puesto:
+                return False
+
+            puesto_ocupado = cls.objects.filter(
+                feria=feria,
+                numero_puesto=numero_puesto,
+                estado='Confirmada'
+            )
+
+            # Si es update, excluimos el ID de la inscripción actual
+            if instancia_id is not None:
+                puesto_ocupado = puesto_ocupado.exclude(id=instancia_id)
+
+            return puesto_ocupado.exists()
+
+
+        @classmethod
         def validate(cls, **kwargs) -> list[str]:
         # si se llegara a agregar alguna validacion en la clase madre la ejecuta
             errors = super().validate(**kwargs)
@@ -421,7 +443,8 @@ class Inscripcion(ValidableModel):
             numero_puesto = kwargs.get("numero_puesto", None)
             estado_enviado = kwargs.get("estado", None)
             estado_efectivo = estado_enviado or "Lista_espera"
-
+            instancia_id = kwargs.get("instancia_id", None)
+            
             if numero_puesto is not None:
                 # Validar que sea un número válido
                 if int(numero_puesto) <= 0:
@@ -437,6 +460,10 @@ class Inscripcion(ValidableModel):
                     
             if estado_efectivo == "Confirmada" and not numero_puesto:
                 errors.append("Las inscripciones aceptadas deben tener un número de puesto asignado.")
+            # --- VALIDACIÓN DE PUESTO DUPLICADO ---
+            if estado_efectivo == "Confirmada":
+                if cls.existe_puesto(feria, numero_puesto, instancia_id):
+                    errors.append(f"El número de puesto {numero_puesto} ya se encuentra ocupado en esta feria.")
             
             registrado_por = kwargs.get("registrado_por", "")
             if isinstance(registrado_por, str):
@@ -483,8 +510,9 @@ class Inscripcion(ValidableModel):
             #como validate si o si chequea que esten ciertos argumentos se los seteo como si hubieran sido enviado en el update
             kwargs.setdefault("feria", self.feria)
             kwargs.setdefault("emprendedor", self.emprendedor)
-
-           
+            kwargs.setdefault("registrado_por", self.registrado_por)
+            kwargs.setdefault("estado", self.estado)
+            kwargs['instancia_id'] = self.id
             
             return super().update(**kwargs)
 
