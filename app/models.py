@@ -410,11 +410,11 @@ class Inscripcion(ValidableModel):
             #si hay cadena vacia o None entra al error
             if not emprendedor :
                 errors.append("Es obligatorio indicar el emprendedor que solicita la inscripcion")
-            
+                
             feria = kwargs.get("feria",None)    
             if isinstance(feria,str):
                 feria= feria.strip()
-            #si hay cadena vacia o None entra al error
+                #si hay cadena vacia o None entra al error
             if not feria :
                 errors.append("Es obligatorio indicar en que feria se solicita la inscripcion")
             
@@ -448,6 +448,45 @@ class Inscripcion(ValidableModel):
 
             return errors
              
+        def update(self, **kwargs) -> list[str]:
+            """Sobreescribo el metodo porque igual hay que tener en cuenta casos propios de la instancia del modelo"""
+            errors = []
+
+            
+
+        
+            if "emprendedor" in kwargs and self.emprendedor != kwargs["emprendedor"]:
+                errors.append("No se puede modificar el emprendedor de una inscripción existente. Debe cancelar la inscripcion")
+            
+            if "feria" in kwargs and self.feria != kwargs["feria"]:
+                errors.append("No se puede modificar la feria de una inscripción existente. Debe cancelar la inscripcion")
+            
+            if "registrado_por" in kwargs and self.registrado_por != kwargs["registrado_por"].strip():
+                errors.append("No se puede modificar el usuario que registró la inscripción.")
+
+            
+            nuevo_estado = kwargs.get("estado", None)
+            if nuevo_estado and self.estado != nuevo_estado:
+                if nuevo_estado == "Confirmada" and self.estado != "Lista_espera":
+                    errors.append(f"No se puede confirmar una inscripción cuyo estado actual es '{self.estado}'. Debe estar en 'Lista_espera'.")
+                
+                if nuevo_estado == "Cancelada" and self.estado not in ["Lista_espera", "Confirmada"]:
+                    errors.append(f"No se puede cancelar una inscripción cuyo estado actual es '{self.estado}'.")
+                
+                if nuevo_estado == "Lista_espera":
+                    errors.append("No se puede cambiar el estado de una inscripción de regreso a 'Lista_espera'.")
+
+            
+            if errors:
+                return errors
+            
+            #como validate si o si chequea que esten ciertos argumentos se los seteo como si hubieran sido enviado en el update
+            kwargs.setdefault("feria", self.feria)
+            kwargs.setdefault("emprendedor", self.emprendedor)
+
+           
+            
+            return super().update(**kwargs)
 
 
     # --- BLOQUE 4: Feedback y Notificaciones (Persona D) ---
