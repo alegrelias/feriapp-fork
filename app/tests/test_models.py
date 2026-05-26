@@ -96,7 +96,7 @@ class FeriaModelTest(TestCase):
             ubicacion="Plaza Central",
             capacidad_puestos=10,
         )
-        
+
     # --- __str__ y métodos simples ---
 
     def test_str_retorna_nombre(self):
@@ -179,7 +179,7 @@ class FeriaModelTest(TestCase):
         ubicacion="",
         capacidad_puestos=10
         )
-        self.assertTrue(len(errors) > 0)    
+        self.assertTrue(len(errors) > 0)
 
     # --- new ---
 
@@ -374,8 +374,8 @@ class SectorModelTest(TestCase):
 class EmprendedorModelTest(TestCase):
     def setUp(self):
         self.user = User.objects.create_user(
-            username="jhondoe", 
-            email="doejhon@gmail.com", 
+            username="jhondoe",
+            email="doejhon@gmail.com",
             password="password123"
         )
 
@@ -413,7 +413,7 @@ class EmprendedorModelTest(TestCase):
 
         emprendedor_b = Emprendedor.objects.create(
             nombre="Patricio",
-            apellido="Arenas", 
+            apellido="Arenas",
             email="arenas@gmail.com",
             rubro=self.feria,
             telefono="+54-2901 999999",
@@ -423,7 +423,7 @@ class EmprendedorModelTest(TestCase):
         lista_activos = Emprendedor.objects.listar_activos()
         self.assertEqual(lista_activos[0], emprendedor_b)
         self.assertEqual(lista_activos[1], self.emprendedor)
-        
+
 
     # --- validate ---
     def test_validate_datos_correctos_retorna_lista_vacia(self):
@@ -437,7 +437,7 @@ class EmprendedorModelTest(TestCase):
         )
         #Debe devolver una lista vacia
         self.assertEqual(errors, [])
-    
+
     def test_validate_error_falta_nombre(self):
         errors = Emprendedor.validate(
             nombre="",
@@ -448,7 +448,7 @@ class EmprendedorModelTest(TestCase):
             usuario=self.user
         )
         self.assertTrue(len(errors) > 0)
-    
+
     def test_validate_error_falta_feria(self):
         errors = Emprendedor.validate(
             nombre="Juan",
@@ -489,9 +489,9 @@ class EmprendedorModelTest(TestCase):
     def test_new_con_datos_invalidos_retorna_errores_y_no_crea(self):
         count_antes = Emprendedor.objects.count()
         emprendedor, errors = Emprendedor.new(
-            nombre="", 
-            apellido="", 
-            email="", 
+            nombre="",
+            apellido="",
+            email="",
             rubro=None,
             telefono="",
             usuario=None)
@@ -516,9 +516,9 @@ class EmprendedorModelTest(TestCase):
 
     def test_update_con_datos_invalidos_no_modifica(self):
         errors = self.emprendedor.update(
-            nombre="", 
-            apellido="", 
-            email="", 
+            nombre="",
+            apellido="",
+            email="",
             rubro=None,
             telefono="",
             usuario=None)
@@ -529,8 +529,8 @@ class EmprendedorModelTest(TestCase):
 class VisitanteModelTest(TestCase):
     def setUp(self):
         self.user = User.objects.create_user(
-            username="jhondoe", 
-            email="doejhon@gmail.com", 
+            username="jhondoe",
+            email="doejhon@gmail.com",
             password="password123"
         )
 
@@ -541,7 +541,7 @@ class VisitanteModelTest(TestCase):
             usuario=self.user,
             fecha_registro=date(2026, 7, 1),
         )
-    
+
     def test_str_retorna_nombre(self):
         self.assertEqual(str(self.visitante), "Jhon")
 
@@ -556,7 +556,7 @@ class VisitanteModelTest(TestCase):
         )
         #Debe devolver una lista vacia
         self.assertEqual(errors, [])
-    
+
     def test_validate_error_falta_nombre(self):
         errors = Visitante.validate(
             nombre="",
@@ -566,7 +566,7 @@ class VisitanteModelTest(TestCase):
             fecha_registro=date(2026, 9, 1)
         )
         self.assertTrue(len(errors) > 0)
-    
+
     def test_validate_error_falta_fecha(self):
         errors = Visitante.validate(
             nombre="Juan",
@@ -639,19 +639,19 @@ class VisitanteModelTest(TestCase):
         self.assertEqual(self.visitante.nombre, "Jhon")  # sin cambios
 
 class InscripcionModelTest(TestCase):
-    
+
     def setUp(self):
         """Crea datos base reutilizables"""
         self.user = User.objects.create_user(
             username="testuser",
             email="test@gmail.com"
         )
-        
+
         self.categoria = Categoria.objects.create(
             nombre="Artesanías",
             descripcion="Ferias artesanales"
         )
-        
+
         self.feria = Feria.objects.create(
             nombre="Feria de Invierno",
             categoria=self.categoria,
@@ -660,7 +660,7 @@ class InscripcionModelTest(TestCase):
             ubicacion="Plaza Central",
             capacidad_puestos=10
         )
-        
+
         self.emprendedor = Emprendedor.objects.create(
             nombre="Juan",
             apellido="Perez",
@@ -671,7 +671,7 @@ class InscripcionModelTest(TestCase):
         )
 
     # --- __str__ ---
-    
+
     def test_str_retorna_formato_correcto(self):
         inscripcion = Inscripcion.objects.create(
             emprendedor=self.emprendedor,
@@ -681,7 +681,7 @@ class InscripcionModelTest(TestCase):
         self.assertEqual(str(inscripcion), f"Inscripción {inscripcion.id} - {self.emprendedor}")
 
     # --- validate ---
-    
+
     def test_validate_datos_correctos_retorna_lista_vacia(self):
         errors = Inscripcion.validate(
             emprendedor=self.emprendedor,
@@ -765,7 +765,7 @@ class InscripcionModelTest(TestCase):
         self.assertTrue(len(errors) > 0)
 
     # --- new ---
-    
+
     def test_new_crea_inscripcion_con_datos_validos(self):
         inscripcion, errors = Inscripcion.new(
             emprendedor=self.emprendedor,
@@ -800,11 +800,11 @@ class InscripcionModelTest(TestCase):
         self.assertEqual(Inscripcion.objects.count(), count_antes)
 
     # --- update ---
-    
+
     def test_update_puesto_en_inscripcion_confirmada_falla_por_bug_de_estado_none(self):
         """
-        Demuestra el bug crítico: Al actualizar SOLO el número de puesto 
-        en una inscripción que ya está Confirmada, el sistema falla 
+        Demuestra el bug crítico: Al actualizar SOLO el número de puesto
+        en una inscripción que ya está Confirmada, el sistema falla
         porque 'estado' no viaja en los kwargs y validate asume que es None.
         """
         # 1. Creamos una inscripción que nace correctamente Confirmada y con puesto
@@ -828,10 +828,10 @@ class InscripcionModelTest(TestCase):
         # 4. Verificación de persistencia en la base de datos
         inscripcion_confirmada.refresh_from_db()
         self.assertEqual(inscripcion_confirmada.numero_puesto, 10)
-    
+
     def test_update_mismo_puesto_en_otra_inscripcion_falla(self):
         """
-        Caso A: Valida que el sistema PROHÍBA asignar un puesto 
+        Caso A: Valida que el sistema PROHÍBA asignar un puesto
         que ya está ocupado por otra inscripción confirmada.
         """
         # 1. Creamos la primera inscripción confirmada en el puesto 5
@@ -864,12 +864,12 @@ class InscripcionModelTest(TestCase):
             feria=self.feria,
             registrado_por="admin"
         )
-        
+
         errors = inscripcion.update(
             estado="Confirmada",
             numero_puesto=7
         )
-        
+
         self.assertEqual(errors, [])
         inscripcion.refresh_from_db()
         self.assertEqual(inscripcion.estado, "Confirmada")
@@ -885,13 +885,13 @@ class InscripcionModelTest(TestCase):
             telefono="+54-2901 999999",
             usuario=user2
         )
-        
+
         inscripcion = Inscripcion.objects.create(
             emprendedor=self.emprendedor,
             feria=self.feria,
             registrado_por="admin"
         )
-        
+
         errors = inscripcion.update(emprendedor=emprendedor2)
         self.assertTrue(len(errors) > 0)
 
@@ -904,13 +904,13 @@ class InscripcionModelTest(TestCase):
             ubicacion="Otro Lugar",
             capacidad_puestos=5
         )
-        
+
         inscripcion = Inscripcion.objects.create(
             emprendedor=self.emprendedor,
             feria=self.feria,
             registrado_por="admin"
         )
-        
+
         errors = inscripcion.update(feria=feria2)
         self.assertTrue(len(errors) > 0)
 
@@ -920,7 +920,7 @@ class InscripcionModelTest(TestCase):
             feria=self.feria,
             registrado_por="admin"
         )
-        
+
         errors = inscripcion.update(registrado_por="otro_admin")
         self.assertTrue(len(errors) > 0)
 
@@ -931,7 +931,7 @@ class InscripcionModelTest(TestCase):
             estado="Cancelada",
             registrado_por="admin"
         )
-        
+
         errors = inscripcion.update(estado="Confirmada", numero_puesto=5)
         self.assertTrue(len(errors) > 0)
 
@@ -943,7 +943,7 @@ class InscripcionModelTest(TestCase):
             numero_puesto=5,
             registrado_por="admin"
         )
-        
+
         errors = inscripcion.update(estado="Lista_espera")
         self.assertTrue(len(errors) > 0)
 
@@ -953,27 +953,27 @@ class InscripcionModelTest(TestCase):
             feria=self.feria,
             registrado_por="admin"
         )
-        
+
         errors = inscripcion.update(estado="Confirmada", numero_puesto=0)
         self.assertTrue(len(errors) > 0)
         inscripcion.refresh_from_db()
         self.assertEqual(inscripcion.estado, "Lista_espera")
 
     # --- cancelar_inscripcion ---
-    
+
     def test_cancelar_inscripcion_cambia_estado(self):
         inscripcion = Inscripcion.objects.create(
             emprendedor=self.emprendedor,
             feria=self.feria,
             registrado_por="admin"
         )
-        
+
         inscripcion.cancelar_inscripcion()
         inscripcion.refresh_from_db()
         self.assertEqual(inscripcion.estado, "Cancelada")
 
     # --- listar_activos (Manager) ---
-    
+
     def test_listar_activos_solo_retorna_confirmadas(self):
         Inscripcion.objects.create(
             emprendedor=self.emprendedor,
@@ -982,14 +982,142 @@ class InscripcionModelTest(TestCase):
             numero_puesto=1,
             registrado_por="admin"
         )
-        
+
         Inscripcion.objects.create(
             emprendedor=self.emprendedor,
             feria=self.feria,
             estado="Lista_espera",
             registrado_por="admin"
         )
-        
+
         activos = Inscripcion.objects.listar_activos()
         self.assertEqual(activos.count(), 1)
         self.assertEqual(activos[0].estado, "Confirmada")
+
+class ReseniaModelTest(TestCase):
+
+    def setUp(self):
+        self.user = User.objects.create_user(
+            username="visitante1",
+            email="visitante1@gmail.com",
+            password="password123"
+        )
+
+    self.visitante = Visitante.objects.create(
+        nombre="Harry",
+        apellido="Potter",
+        email="harrypotter1@gmail.com",
+        usuario=self.user,
+        fecha_registro=date(2026, 7, 1),
+    )
+
+    self.categoria = Categoria.objects.create(
+        nombre="Tecnologia",
+        descripcion="Ferias tecnológicas"
+    )
+
+    self.feria = Feria.objects.create(
+        nombre="Feria Tech",
+        categoria=self.categoria,
+        fecha_inicio=date(2026, 9, 1),
+        fecha_fin=date(2026, 9, 10),
+        ubicacion="Ushuaia",
+        capacidad_puestos=20
+    )
+
+    def test_str_retorna_formato_correcto(self):
+        resenia = Resenia.objects.create(
+            visitante=self.visitante,
+            feria=self.feria,
+            calificacion=4,
+            comentario="Muy buena feria, la pasé genial!"
+        )
+        expected_str = f" Reseña de {self.visitante} para {self.feria.nombre} - Calificación: {resenia.calificacion}"
+        self.assertEqual(str(resenia), expected_str)
+
+    def test_validate_datos_correctos_retorna_lista_vacia(self):
+        errors = Resenia.validate(
+            visitante=self.visitante,
+            feria=self.feria,
+            calificacion=5,
+            comentario="Excelente evento!"
+        )
+        self.assertEqual(errors, [])
+
+    def test_validate_error_falta_visitante(self):
+        errors = Resenia.validate(
+            visitante=None,
+            feria=self.feria,
+            calificacion=5,
+            comentario="Excelente evento!"
+        )
+        self.assertTrue(len(errors) > 0)
+
+    def test_validate_error_falta_feria(self):
+        errors = Resenia.validate(
+            visitante=self.visitante,
+            feria=None,
+            calificacion=5,
+            comentario="Excelente evento!"
+        )
+        self.assertTrue(len(errors) > 0)
+
+    def test_validate_error_calificacion_fuera_de_rango(self):
+        errors = Resenia.validate(
+            visitante=self.visitante,
+            feria=self.feria,
+            calificacion=6,  # fuera de rango
+            comentario="Excelente evento!"
+        )
+        self.assertTrue(len(errors) > 0)
+
+    def test_validate_error_calificacion_negativa(self):
+        errors = Resenia.validate(
+            visitante=self.visitante,
+            feria=self.feria,
+            calificacion=-1,  # fuera de rango
+            comentario="No me gustó"
+        )
+        self.assertTrue(len(errors) > 0)
+
+    def test_new_crea_resenia_con_datos_validos(self):
+        resenia, errors = Resenia.new(
+            visitante=self.visitante,
+            feria=self.feria,
+            calificacion=4,
+            comentario="Muy buena feria!"
+        )
+        self.assertEqual(errors, [])
+        self.assertIsNotNone(resenia)
+        self.assertEqual(resenia.calificacion, 4)
+        self.assertTrue(Resenia.objects.filter(id=resenia.id).exists())
+
+    def test_new_con_datos_invalidos_retorna_errores_y_no_crea(self):
+        count_antes = Resenia.objects.count()
+        resenia, errors = Resenia.new(
+            visitante=None,
+            feria=None,
+            calificacion=10,  # fuera de rango
+            comentario=""
+        )
+        self.assertIsNone(resenia)
+        self.assertTrue(len(errors) > 0)
+        self.assertEqual(Resenia.objects.count(), count_antes)
+
+    def test_update_modifica_datos_correctamente(self):
+        resenia = Resenia.objects.create(
+            visitante=self.visitante,
+            feria=self.feria,
+            calificacion=3,
+            comentario="Estuvo bien"
+        )
+
+        errors = resenia.update(
+            calificacion=5,
+            comentario="¡Excelente evento!"
+        )
+
+        self.assertEqual(errors, [])
+        resenia.refresh_from_db()
+        self.assertEqual(resenia.calificacion, 5)
+        self.assertEqual(resenia.comentario, "¡Excelente evento!")
