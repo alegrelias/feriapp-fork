@@ -7,12 +7,48 @@ from app.base_models import ValidableModel
 #Importo esta clase que permite usar la clase "User" provista por Django
 from django.contrib.auth.models import User
 
+class Categoria(ValidableModel):
+    """Representa una categoría de feria."""
+
+    nombre = models.CharField(max_length=100,unique=True)
+    descripcion = models.TextField()
+
+    class Meta:
+        ordering = ["nombre"]
+
+    def __str__(self):
+
+        return self.nombre
+
+    def cantidad_ferias(self):
+        """Retorna la cantidad de ferias asociadas."""
+
+        return self.ferias.count()
+
+    @classmethod
+    def validate(cls, **kwargs) -> list[str]:
+
+        errors = []
+
+        nombre = (kwargs.get("nombre", "").strip() if kwargs.get("nombre") else "")
+        descripcion = (kwargs.get("descripcion", "").strip() if kwargs.get("descripcion") else "")
+
+        if not nombre:
+            errors.append("El nombre es obligatorio.")
+
+        if len(nombre) < 3:
+            errors.append("El nombre debe tener al menos 3 caracteres.")
+
+        if not descripcion:
+            errors.append("La descripción es obligatoria.")
+
+        return errors
 
 class Feria(ValidableModel):#<- ya no heredamos de models.Models sino de ValidableModel
     """Representa una feria con su período, ubicación y capacidad disponible."""
 
     nombre = models.CharField(max_length=200)
-    categoria = models.CharField(max_length=100)
+    categoria = models.ForeignKey(Categoria, on_delete=models.CASCADE, related_name="ferias", null=True, blank=True)
     fecha_inicio = models.DateField()
     fecha_fin = models.DateField()
     ubicacion = models.CharField(max_length=200)
@@ -24,53 +60,107 @@ class Feria(ValidableModel):#<- ya no heredamos de models.Models sino de Validab
 
     def __str__(self):
         """Retorna una representación legible de la feria."""
+
         return self.nombre
 
     def puestos_ocupados(self):
         """Retorna la cantidad de inscripciones confirmadas."""
-        # Mientras Inscripcion no exista, no hay relaciones para contar.
-        if not hasattr(self, "inscripcion_set"):
-            return 0
-        return self.inscripcion_set.filter(estado="confirmada").count()
+
+        return 0
 
     def puestos_disponibles(self):
         """Retorna los puestos libres."""
-        return self.capacidad_puestos - self.puestos_ocupados()
+
+        return (self.capacidad_puestos - self.puestos_ocupados())
 
     def tiene_lugar(self):
         """Retorna True si quedan puestos disponibles."""
+
         return self.puestos_disponibles() > 0
+
+    def cantidad_sectores(self):
+        """Retorna la cantidad de sectores asociados."""
+
+        return self.sectores.count()
 
     @classmethod
     def validate(cls, **kwargs) -> list[str]:
-        """
-        Valida los datos de la feria. Retorna una lista de errores.
-        Si la lista está vacía, los datos son válidos.
-        """
+        """Valida los datos de la feria. Retorna una lista de errores."""
+
         errors = []
 
-        # Extracción segura de los argumentos pasados por la vista o tests
-        nombre = kwargs.get('nombre', '').strip() if kwargs.get('nombre') else ''
-        categoria = kwargs.get('categoria', '').strip() if kwargs.get('categoria') else ''
-        ubicacion = kwargs.get('ubicacion', '').strip() if kwargs.get('ubicacion') else ''
-        capacidad_puestos = kwargs.get('capacidad_puestos')
-        fecha_inicio = kwargs.get('fecha_inicio')
-        fecha_fin = kwargs.get('fecha_fin')
+        nombre = (kwargs.get("nombre", "").strip() if kwargs.get("nombre") else "")
+        ubicacion = (kwargs.get("ubicacion", "").strip() if kwargs.get("ubicacion") else "")
+        categoria = kwargs.get("categoria")
+        capacidad_puestos = kwargs.get("capacidad_puestos")
+        fecha_inicio = kwargs.get("fecha_inicio")
+        fecha_fin = kwargs.get("fecha_fin")
 
-        if not nombre or not nombre.strip():
+        if not nombre:
             errors.append("El nombre es obligatorio.")
 
-        if not categoria or not categoria.strip():
+        if categoria is None:
             errors.append("La categoría es obligatoria.")
 
-        if not ubicacion or not ubicacion.strip():
+        if not ubicacion:
             errors.append("La ubicación es obligatoria.")
 
-        if capacidad_puestos is None or capacidad_puestos <= 0:
+        if (capacidad_puestos is None or capacidad_puestos <= 0):
             errors.append("La capacidad de puestos debe ser mayor a cero.")
 
-        if fecha_inicio and fecha_fin and fecha_fin < fecha_inicio:
+        if (fecha_inicio and fecha_fin and fecha_fin < fecha_inicio):
             errors.append("La fecha de fin no puede ser anterior a la fecha de inicio.")
+
+        return errors
+    
+class Sector(ValidableModel):
+    """Representa un sector dentro de una feria."""
+
+    feria = models.ForeignKey(Feria, on_delete=models.CASCADE, related_name="sectores")
+    edicion = models.PositiveIntegerField()
+    nombre = models.CharField(max_length=100)
+    capacidad_puestos = models.PositiveIntegerField()
+    tiene_conexion_electrica = models.BooleanField(default=False)
+
+    class Meta:
+        ordering = ["nombre"]
+
+    def __str__(self):
+
+        return (
+            f"{self.nombre} - "
+            f"{self.feria.nombre}"
+        )
+
+    def hay_lugar(self):
+        """Retorna True si el sector posee capacidad."""
+
+        return self.capacidad_puestos > 0
+
+    @classmethod
+    def validate(cls, **kwargs) -> list[str]:
+
+        errors = []
+
+        nombre = (kwargs.get("nombre", "").strip() if kwargs.get("nombre") else "")
+        feria = kwargs.get("feria")
+        edicion = kwargs.get("edicion")
+        capacidad_puestos = kwargs.get("capacidad_puestos")
+
+        if not nombre:
+            errors.append("El nombre es obligatorio.")
+        
+        if len(nombre) < 2: 
+            errors.append("El nombre debe tener al menos 2 caracteres.")
+
+        if feria is None:
+            errors.append("La feria es obligatoria.")
+
+        if (edicion is None or edicion <= 0):
+            errors.append("La edición debe ser mayor a cero.")
+
+        if (capacidad_puestos is None or capacidad_puestos <= 0):
+            errors.append("La capacidad debe ser mayor a cero.")
 
         return errors
 
@@ -261,11 +351,171 @@ class Visitante(ValidableModel):
 
         return errors
 
-    # --- BLOQUE 2: Estructura de Ferias (Persona B) ---
-    # Aquí van Categoria, Feria, Sector (complejidad media)
-
-    # --- BLOQUE 3: Transacciones (Persona C) ---
+    # --- BLOQUE 3: Transacciones (Aby) ---
     # Aquí va Inscripcion (dependencia con Emprendedor, Feria y Sector) (complejidad alta)
+    
+    #  El Manager solo se encarga de las consultas de conjuntos (QuerySets), maneja la TABLA, las de objetos van como metodo de instancia
+class InscripcionManager(models.Manager):
+    #get_queryset() no lo sobrescribo, por ende hereda el de Django que trae TODO.
+
+    def listar_activos(self):
+        #'emprendedor__apellido' iajá a la tabla relacionada mediante la clave foránea emprendedor y ordená usando la columna apellido de esa otra tabla
+        return self.get_queryset().filter(estado='Confirmada').order_by('emprendedor__apellido', 'emprendedor__nombre')
+        
+  
+            
+class Inscripcion(ValidableModel):
+        
+        emprendedor = models.ForeignKey(Emprendedor, on_delete= models.CASCADE, related_name='inscripciones_emprendedor')
+        #que pasa si feria se borra?, null y blank quedan por defecto en false si no se colocan
+        feria = models.ForeignKey(Feria, on_delete= models.CASCADE, related_name='inscripciones_feria')
+        numero_puesto = models.IntegerField(null=True, blank=True)
+        #se le asigna la fecha cuando fue guardada en el servidor, no se puede modificar
+        fecha_inscripcion= models.DateField(auto_now_add=True)
+        #debe ser lista de tuplas en choices
+        ESTADOS_CHOICES = [
+        ('Confirmada', 'Confirmada'),
+        ('Lista_espera', 'Lista_espera'),
+        ('Cancelada', 'Cancelada'), 
+    ]
+        estado = models.CharField(max_length=20, choices=ESTADOS_CHOICES , default='Lista_espera')
+        registrado_por = models.CharField(max_length=100)
+        
+        #vinculo el manager
+        objects = InscripcionManager()
+        class Meta:
+            #para el panel de admin
+            verbose_name_plural = "Inscripciones"
+            ordering = ["fecha_inscripcion"]
+
+        def __str__(self):
+            #django detecta que quiero acceder al objeto completo de emprendedor, no solo el numero asi que hace join de las tablas y me trae el nombre
+            return f"Inscripción {self.id} - {self.emprendedor}"
+
+        def cancelar_inscripcion(self):
+
+            self.estado = 'Cancelada'
+            self.save()
+
+        @classmethod
+        def existe_puesto(cls, feria, numero_puesto, instancia_id=None) -> bool:
+            """
+            Consulta la BD para ver si el puesto ya está ocupado 
+            en esa feria específica por otra inscripción confirmada.
+            """
+            if not feria or not numero_puesto:
+                return False
+
+            puesto_ocupado = cls.objects.filter(
+                feria=feria,
+                numero_puesto=numero_puesto,
+                estado='Confirmada'
+            )
+
+            # Si es update, excluimos el ID de la inscripción actual
+            if instancia_id is not None:
+                puesto_ocupado = puesto_ocupado.exclude(id=instancia_id)
+
+            return puesto_ocupado.exists()
+
+
+        @classmethod
+        def validate(cls, **kwargs) -> list[str]:
+        # si se llegara a agregar alguna validacion en la clase madre la ejecuta
+            errors = super().validate(**kwargs)
+
+            #si no hay parametro emprendedor, devuelvo un None
+            emprendedor = kwargs.get("emprendedor",None)
+            #si es texto le saco los espacios
+            if isinstance(emprendedor,str):
+                emprendedor= emprendedor.strip()
+            #si hay cadena vacia o None entra al error
+            if not emprendedor :
+                errors.append("Es obligatorio indicar el emprendedor que solicita la inscripcion")
+                
+            feria = kwargs.get("feria",None)    
+            if isinstance(feria,str):
+                feria= feria.strip()
+                #si hay cadena vacia o None entra al error
+            if not feria :
+                errors.append("Es obligatorio indicar en que feria se solicita la inscripcion")
+            
+            numero_puesto = kwargs.get("numero_puesto", None)
+            estado_enviado = kwargs.get("estado", None)
+            estado_efectivo = estado_enviado or "Lista_espera"
+            instancia_id = kwargs.get("instancia_id", None)
+            
+            if numero_puesto is not None:
+                # Validar que sea un número válido
+                if int(numero_puesto) <= 0:
+                    errors.append("El número de puesto debe ser un entero positivo.")
+                
+                # Validar consistencia con el estado
+                if estado_enviado is None:
+                    # Caso A: El usuario no especificó estado pero metió un número de puesto
+                  errors.append("No se puede asignar un número de puesto si la inscripción no está en estado 'Confirmada'.")
+                elif estado_efectivo in ["Lista_espera", "Cancelada"]:
+                    # Caso B: El usuario explícitamente eligió un estado inválido para tener puesto
+                    errors.append(f"No se puede asignar un número de puesto a una inscripción con estado '{estado_efectivo}'.")
+                    
+            if estado_efectivo == "Confirmada" and not numero_puesto:
+                errors.append("Las inscripciones aceptadas deben tener un número de puesto asignado.")
+            # --- VALIDACIÓN DE PUESTO DUPLICADO ---
+            if estado_efectivo == "Confirmada":
+                if cls.existe_puesto(feria, numero_puesto, instancia_id):
+                    errors.append(f"El número de puesto {numero_puesto} ya se encuentra ocupado en esta feria.")
+            
+            registrado_por = kwargs.get("registrado_por", "")
+            if isinstance(registrado_por, str):
+                registrado_por = registrado_por.strip()
+
+            if not registrado_por:
+                errors.append("Debe especificarse el usuario que registra esta inscripción.")
+
+
+            return errors
+             
+        def update(self, **kwargs) -> list[str]:
+            """Sobreescribo el metodo porque igual hay que tener en cuenta casos propios de la instancia del modelo"""
+            errors = []
+
+            
+
+        
+            if "emprendedor" in kwargs and self.emprendedor != kwargs["emprendedor"]:
+                errors.append("No se puede modificar el emprendedor de una inscripción existente. Debe cancelar la inscripcion")
+            
+            if "feria" in kwargs and self.feria != kwargs["feria"]:
+                errors.append("No se puede modificar la feria de una inscripción existente. Debe cancelar la inscripcion")
+            
+            if "registrado_por" in kwargs and self.registrado_por != kwargs["registrado_por"].strip():
+                errors.append("No se puede modificar el usuario que registró la inscripción.")
+
+            
+            nuevo_estado = kwargs.get("estado", None)
+            if nuevo_estado and self.estado != nuevo_estado:
+                if nuevo_estado == "Confirmada" and self.estado != "Lista_espera":
+                    errors.append(f"No se puede confirmar una inscripción cuyo estado actual es '{self.estado}'. Debe estar en 'Lista_espera'.")
+                
+                if nuevo_estado == "Cancelada" and self.estado not in ["Lista_espera", "Confirmada"]:
+                    errors.append(f"No se puede cancelar una inscripción cuyo estado actual es '{self.estado}'.")
+                
+                if nuevo_estado == "Lista_espera":
+                    errors.append("No se puede cambiar el estado de una inscripción de regreso a 'Lista_espera'.")
+
+            
+            if errors:
+                return errors
+            
+            #como validate si o si chequea que esten ciertos argumentos se los seteo como si hubieran sido enviado en el update
+            kwargs.setdefault("feria", self.feria)
+            kwargs.setdefault("emprendedor", self.emprendedor)
+            kwargs.setdefault("registrado_por", self.registrado_por)
+            kwargs.setdefault("estado", self.estado)
+            kwargs['instancia_id'] = self.id
+            
+            return super().update(**kwargs)
+
 
     # --- BLOQUE 4: Feedback y Notificaciones (Persona D) ---
     # Aquí van Reseña(vincula Visistante con la Feria), Notificacion(cualquier User con alertas de sistema) (complejidad media)
