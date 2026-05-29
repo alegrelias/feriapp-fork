@@ -573,27 +573,20 @@ class Notificacion(ValidableModel):
         ordering = ['-fecha_notificacion']
 
     def __str__(self):
-        """Retorna una representación legible de la notificación"""
-        return f"Notificación: {self.titulo} - {self.mensaje[:30]}..."
-
+        usuarios = self.usuarios.all()
+        nombres = ", ".join(u.username for u in usuarios)
+        if usuarios.exists():
+            return f"Notificación creada para usuarios: {nombres} | Título: {self.titulo}"
+        else:
+            return f"Notificación sin destinatarios | Título: {self.titulo}"
+            
     @classmethod
     def validate(cls, **kwargs) -> list[str]:
-        """
-        Valida los datos de la notificación. Retorna una lista de errores.
-        Si la lista está vacía, los datos son válidos.
-        """
         errors = []
 
-        # Extracción segura para textos: saca espacios en blanco extra y evita que sea 'None'
-        titulo = kwargs.get('titulo', '').strip() if kwargs.get('titulo') else ''
-        mensaje = kwargs.get('mensaje', '').strip() if kwargs.get('mensaje') else ''
-
-        # Extracción segura para Objetos/IDs (Foreign Keys): no se les puede hacer .strip()
+        titulo = kwargs.get('titulo', '').strip()
+        mensaje = kwargs.get('mensaje', '').strip()
         usuarios = kwargs.get('usuarios')
-
-        # --- VALIDACIONES ---
-        if not usuarios:
-            errors.append("Debe haber al menos un usuario destinatario.")
 
         if not titulo:
             errors.append("El título es obligatorio.")
@@ -601,10 +594,43 @@ class Notificacion(ValidableModel):
         if not mensaje:
             errors.append("El mensaje es obligatorio.")
 
+        # clave: manejar lista o queryset correctamente
         if not usuarios:
             errors.append("Debe haber al menos un usuario destinatario.")
 
         return errors
+
+    @classmethod
+    def new(cls, **kwargs):
+        usuarios = kwargs.pop("usuarios", None)
+        errors = cls.validate(**kwargs, usuarios=usuarios)
+        if errors:
+            return None, errors
+
+        notificacion = cls.objects.create(**kwargs)
+
+        if usuarios:
+            notificacion.usuarios.set(usuarios)
+
+        return notificacion, []
+
+
+    def update(self, **kwargs):
+        usuarios = kwargs.pop("usuarios", None)
+
+        errors = self.validate(**kwargs, usuarios=usuarios)
+        if errors:
+            return errors
+
+        for key, value in kwargs.items():
+            setattr(self, key, value)
+
+        self.save()
+
+        if usuarios is not None:
+            self.usuarios.set(usuarios)
+
+        return []
 
 
 

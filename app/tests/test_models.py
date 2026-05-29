@@ -1133,3 +1133,122 @@ class ReseniaModelTest(TestCase):
         self.assertEqual(resenia.calificacion, 5)
         self.assertEqual(resenia.comentario, "¡Excelente evento!")
 
+class NotificacionModelTest(TestCase):
+
+    def setUp(self):
+        self.user1 = User.objects.create_user(
+            username="user1",
+            email="user1@example.com"
+        )
+        self.user2 = User.objects.create_user(
+            username="user2",
+            email="user2@example.com"
+        )
+    # --- __str__ ---
+
+    def test_str_retorna_formato_correcto(self):
+        notificacion = Notificacion.objects.create(
+            titulo="Nueva Notificación",
+            mensaje="Tienes una nueva notificación",
+        )
+        notificacion.usuarios.set([self.user1])
+        self.assertIn("Notificación creada para usuarios: user1", str(notificacion))
+        self.assertIn("Título: Nueva Notificación", str(notificacion))
+
+    # --- validate ---
+    def test_validate_datos_correctos_retorna_lista_vacia(self):
+        errors = Notificacion.validate(
+            titulo="Alerta de Feria",
+            mensaje="La feria de este fin de semana ha sido cancelada.",
+            usuarios=[self.user1, self.user2]
+        )
+        self.assertEqual(errors, [])
+
+    def test_validate_error_falta_titulo(self):
+        errors = Notificacion.validate(
+            titulo="",
+            mensaje="La feria de este fin de semana ha sido cancelada.",
+            usuarios=[self.user1, self.user2]
+        )
+        self.assertTrue(len(errors) > 0)
+
+    def test_validate_error_falta_mensaje(self):
+        errors = Notificacion.validate(
+            titulo="Alerta de Feria",
+            mensaje="",
+            usuarios=[self.user1, self.user2]
+        )
+        self.assertTrue(len(errors) > 0)
+
+    def test_validate_error_falta_usuarios(self):
+        errors = Notificacion.validate(
+            titulo="Alerta de Feria",
+            mensaje="La feria de este fin de semana ha sido cancelada.",
+            usuarios=[]
+        )
+        self.assertTrue(len(errors) > 0)
+
+    # --- new ---
+
+    def test_new_crea_notificacion_con_datos_validos(self):
+        notificacion, errors = Notificacion.new(
+            titulo="Alerta de Feria",
+            mensaje="La feria de este fin de semana ha sido cancelada.",
+            usuarios=[self.user1, self.user2]
+        )
+        self.assertEqual(errors, [])
+        self.assertIsNotNone(notificacion)
+        self.assertEqual(notificacion.titulo, "Alerta de Feria")
+        self.assertTrue(
+            Notificacion.objects.filter(id=notificacion.id).exists())
+
+    def test_new_con_datos_invalidos_retorna_errores_y_no_crea(self):
+        count_antes = Notificacion.objects.count()
+        notificacion, errors = Notificacion.new(
+            titulo="",
+            mensaje="",
+            usuarios=[]
+        )
+        self.assertIsNone(notificacion)
+        self.assertTrue(len(errors) > 0)
+        self.assertEqual(Notificacion.objects.count(), count_antes)
+
+    # --- update ---
+
+    def test_update_modifica_datos_correctamente(self):
+        notificacion = Notificacion.objects.create(
+            titulo="Alerta de Feria",
+            mensaje="La feria de este fin de semana ha sido cancelada.",
+        )
+        notificacion.usuarios.set([self.user1])
+
+        errors = notificacion.update(
+            titulo="Actualización de Feria",
+            mensaje="La feria se reprogramó para el próximo mes.",
+            usuarios=[self.user1, self.user2]
+        )
+
+        self.assertEqual(errors, [])
+        notificacion.refresh_from_db()
+        self.assertEqual(notificacion.titulo, "Actualización de Feria")
+        self.assertEqual(notificacion.mensaje, "La feria se reprogramó para el próximo mes.")
+        self.assertTrue(self.user2 in notificacion.usuarios.all())
+
+    def test_update_con_datos_invalidos_no_modifica(self):
+        notificacion = Notificacion.objects.create(
+            titulo="Alerta de Feria",
+            mensaje="La feria de este fin de semana ha sido cancelada.",
+        )
+        notificacion.usuarios.set([self.user1])
+
+        errors = notificacion.update(
+            titulo="",
+            mensaje="",
+            usuarios=[]
+        )
+
+        self.assertTrue(len(errors) > 0)
+        notificacion.refresh_from_db()
+        self.assertEqual(notificacion.titulo, "Alerta de Feria")  # sin cambios
+        self.assertEqual(notificacion.mensaje, "La feria de este fin de semana ha sido cancelada.")  # sin cambios
+        self.assertTrue(self.user1 in notificacion.usuarios.all())  # sin cambios
