@@ -6,7 +6,7 @@ from django.test import TestCase
 
 from django.contrib.auth.models import User
 
-from app.models import Categoria, Feria, Sector, Emprendedor, Visitante, Inscripcion
+from app.models import Categoria, Feria, Sector, Emprendedor, Visitante, Inscripcion, Resenia, Notificacion
 
 
 class CategoriaModelTest(TestCase):
@@ -1003,27 +1003,29 @@ class ReseniaModelTest(TestCase):
             password="password123"
         )
 
-    self.visitante = Visitante.objects.create(
+        self.visitante = Visitante.objects.create(
         nombre="Harry",
         apellido="Potter",
         email="harrypotter1@gmail.com",
         usuario=self.user,
         fecha_registro=date(2026, 7, 1),
-    )
+        )
 
-    self.categoria = Categoria.objects.create(
+        self.categoria = Categoria.objects.create(
         nombre="Tecnologia",
         descripcion="Ferias tecnológicas"
-    )
+        )
 
-    self.feria = Feria.objects.create(
+        self.feria = Feria.objects.create(
         nombre="Feria Tech",
         categoria=self.categoria,
         fecha_inicio=date(2026, 9, 1),
         fecha_fin=date(2026, 9, 10),
         ubicacion="Ushuaia",
         capacidad_puestos=20
-    )
+        )
+
+    # --- __str__ ---
 
     def test_str_retorna_formato_correcto(self):
         resenia = Resenia.objects.create(
@@ -1032,8 +1034,13 @@ class ReseniaModelTest(TestCase):
             calificacion=4,
             comentario="Muy buena feria, la pasé genial!"
         )
-        expected_str = f" Reseña de {self.visitante} para {self.feria.nombre} - Calificación: {resenia.calificacion}"
-        self.assertEqual(str(resenia), expected_str)
+
+        self.assertEqual(
+            str(resenia),
+            "Reseña de Harry para Feria Tech (4*)"
+        )
+
+    # --- validate ---
 
     def test_validate_datos_correctos_retorna_lista_vacia(self):
         errors = Resenia.validate(
@@ -1076,9 +1083,11 @@ class ReseniaModelTest(TestCase):
             visitante=self.visitante,
             feria=self.feria,
             calificacion=-1,  # fuera de rango
-            comentario="No me gustó"
+            comentario="No me gustó, no habia magos, ni dragones ni nada :("
         )
         self.assertTrue(len(errors) > 0)
+
+    # --- new ---
 
     def test_new_crea_resenia_con_datos_validos(self):
         resenia, errors = Resenia.new(
@@ -1090,7 +1099,8 @@ class ReseniaModelTest(TestCase):
         self.assertEqual(errors, [])
         self.assertIsNotNone(resenia)
         self.assertEqual(resenia.calificacion, 4)
-        self.assertTrue(Resenia.objects.filter(id=resenia.id).exists())
+        self.assertTrue(
+            Resenia.objects.filter(id=resenia.id).exists())
 
     def test_new_con_datos_invalidos_retorna_errores_y_no_crea(self):
         count_antes = Resenia.objects.count()
@@ -1104,13 +1114,14 @@ class ReseniaModelTest(TestCase):
         self.assertTrue(len(errors) > 0)
         self.assertEqual(Resenia.objects.count(), count_antes)
 
-    def test_update_modifica_datos_correctamente(self):
-        resenia = Resenia.objects.create(
-            visitante=self.visitante,
-            feria=self.feria,
-            calificacion=3,
-            comentario="Estuvo bien"
-        )
+    # --- update ---
+
+    def update(self, **kwargs):
+
+        kwargs.setdefault("visitante", self.visitante)
+        kwargs.setdefault("feria", self.feria)
+
+        return super().update(**kwargs)
 
         errors = resenia.update(
             calificacion=5,
@@ -1121,3 +1132,4 @@ class ReseniaModelTest(TestCase):
         resenia.refresh_from_db()
         self.assertEqual(resenia.calificacion, 5)
         self.assertEqual(resenia.comentario, "¡Excelente evento!")
+

@@ -112,7 +112,7 @@ class Feria(ValidableModel):#<- ya no heredamos de models.Models sino de Validab
             errors.append("La fecha de fin no puede ser anterior a la fecha de inicio.")
 
         return errors
-    
+
 class Sector(ValidableModel):
     """Representa un sector dentro de una feria."""
 
@@ -149,8 +149,8 @@ class Sector(ValidableModel):
 
         if not nombre:
             errors.append("El nombre es obligatorio.")
-        
-        if len(nombre) < 2: 
+
+        if len(nombre) < 2:
             errors.append("El nombre debe tener al menos 2 caracteres.")
 
         if feria is None:
@@ -353,7 +353,7 @@ class Visitante(ValidableModel):
 
     # --- BLOQUE 3: Transacciones (Aby) ---
     # Aquí va Inscripcion (dependencia con Emprendedor, Feria y Sector) (complejidad alta)
-    
+
     #  El Manager solo se encarga de las consultas de conjuntos (QuerySets), maneja la TABLA, las de objetos van como metodo de instancia
 class InscripcionManager(models.Manager):
     #get_queryset() no lo sobrescribo, por ende hereda el de Django que trae TODO.
@@ -361,11 +361,11 @@ class InscripcionManager(models.Manager):
     def listar_activos(self):
         #'emprendedor__apellido' iajá a la tabla relacionada mediante la clave foránea emprendedor y ordená usando la columna apellido de esa otra tabla
         return self.get_queryset().filter(estado='Confirmada').order_by('emprendedor__apellido', 'emprendedor__nombre')
-        
-  
-            
+
+
+
 class Inscripcion(ValidableModel):
-        
+
         emprendedor = models.ForeignKey(Emprendedor, on_delete= models.CASCADE, related_name='inscripciones_emprendedor')
         #que pasa si feria se borra?, null y blank quedan por defecto en false si no se colocan
         feria = models.ForeignKey(Feria, on_delete= models.CASCADE, related_name='inscripciones_feria')
@@ -376,11 +376,11 @@ class Inscripcion(ValidableModel):
         ESTADOS_CHOICES = [
         ('Confirmada', 'Confirmada'),
         ('Lista_espera', 'Lista_espera'),
-        ('Cancelada', 'Cancelada'), 
+        ('Cancelada', 'Cancelada'),
     ]
         estado = models.CharField(max_length=20, choices=ESTADOS_CHOICES , default='Lista_espera')
         registrado_por = models.CharField(max_length=100)
-        
+
         #vinculo el manager
         objects = InscripcionManager()
         class Meta:
@@ -400,7 +400,7 @@ class Inscripcion(ValidableModel):
         @classmethod
         def existe_puesto(cls, feria, numero_puesto, instancia_id=None) -> bool:
             """
-            Consulta la BD para ver si el puesto ya está ocupado 
+            Consulta la BD para ver si el puesto ya está ocupado
             en esa feria específica por otra inscripción confirmada.
             """
             if not feria or not numero_puesto:
@@ -432,24 +432,24 @@ class Inscripcion(ValidableModel):
             #si hay cadena vacia o None entra al error
             if not emprendedor :
                 errors.append("Es obligatorio indicar el emprendedor que solicita la inscripcion")
-                
-            feria = kwargs.get("feria",None)    
+
+            feria = kwargs.get("feria",None)
             if isinstance(feria,str):
                 feria= feria.strip()
                 #si hay cadena vacia o None entra al error
             if not feria :
                 errors.append("Es obligatorio indicar en que feria se solicita la inscripcion")
-            
+
             numero_puesto = kwargs.get("numero_puesto", None)
             estado_enviado = kwargs.get("estado", None)
             estado_efectivo = estado_enviado or "Lista_espera"
             instancia_id = kwargs.get("instancia_id", None)
-            
+
             if numero_puesto is not None:
                 # Validar que sea un número válido
                 if int(numero_puesto) <= 0:
                     errors.append("El número de puesto debe ser un entero positivo.")
-                
+
                 # Validar consistencia con el estado
                 if estado_enviado is None:
                     # Caso A: El usuario no especificó estado pero metió un número de puesto
@@ -457,14 +457,14 @@ class Inscripcion(ValidableModel):
                 elif estado_efectivo in ["Lista_espera", "Cancelada"]:
                     # Caso B: El usuario explícitamente eligió un estado inválido para tener puesto
                     errors.append(f"No se puede asignar un número de puesto a una inscripción con estado '{estado_efectivo}'.")
-                    
+
             if estado_efectivo == "Confirmada" and not numero_puesto:
                 errors.append("Las inscripciones aceptadas deben tener un número de puesto asignado.")
             # --- VALIDACIÓN DE PUESTO DUPLICADO ---
             if estado_efectivo == "Confirmada":
                 if cls.existe_puesto(feria, numero_puesto, instancia_id):
                     errors.append(f"El número de puesto {numero_puesto} ya se encuentra ocupado en esta feria.")
-            
+
             registrado_por = kwargs.get("registrado_por", "")
             if isinstance(registrado_por, str):
                 registrado_por = registrado_por.strip()
@@ -474,46 +474,46 @@ class Inscripcion(ValidableModel):
 
 
             return errors
-             
+
         def update(self, **kwargs) -> list[str]:
             """Sobreescribo el metodo porque igual hay que tener en cuenta casos propios de la instancia del modelo"""
             errors = []
 
-            
 
-        
+
+
             if "emprendedor" in kwargs and self.emprendedor != kwargs["emprendedor"]:
                 errors.append("No se puede modificar el emprendedor de una inscripción existente. Debe cancelar la inscripcion")
-            
+
             if "feria" in kwargs and self.feria != kwargs["feria"]:
                 errors.append("No se puede modificar la feria de una inscripción existente. Debe cancelar la inscripcion")
-            
+
             if "registrado_por" in kwargs and self.registrado_por != kwargs["registrado_por"].strip():
                 errors.append("No se puede modificar el usuario que registró la inscripción.")
 
-            
+
             nuevo_estado = kwargs.get("estado", None)
             if nuevo_estado and self.estado != nuevo_estado:
                 if nuevo_estado == "Confirmada" and self.estado != "Lista_espera":
                     errors.append(f"No se puede confirmar una inscripción cuyo estado actual es '{self.estado}'. Debe estar en 'Lista_espera'.")
-                
+
                 if nuevo_estado == "Cancelada" and self.estado not in ["Lista_espera", "Confirmada"]:
                     errors.append(f"No se puede cancelar una inscripción cuyo estado actual es '{self.estado}'.")
-                
+
                 if nuevo_estado == "Lista_espera":
                     errors.append("No se puede cambiar el estado de una inscripción de regreso a 'Lista_espera'.")
 
-            
+
             if errors:
                 return errors
-            
+
             #como validate si o si chequea que esten ciertos argumentos se los seteo como si hubieran sido enviado en el update
             kwargs.setdefault("feria", self.feria)
             kwargs.setdefault("emprendedor", self.emprendedor)
             kwargs.setdefault("registrado_por", self.registrado_por)
             kwargs.setdefault("estado", self.estado)
             kwargs['instancia_id'] = self.id
-            
+
             return super().update(**kwargs)
 
 
@@ -549,7 +549,6 @@ class Resenia(ValidableModel):
         visitante = kwargs.get('visitante')
         feria = kwargs.get('feria')
         calificacion = kwargs.get('calificacion')
-        comentario = kwargs.get('comentario', '').strip() if kwargs.get('comentario') else ''
 
         # --- VALIDACIONES ---
         if visitante is None:
@@ -593,6 +592,9 @@ class Notificacion(ValidableModel):
         usuarios = kwargs.get('usuarios')
 
         # --- VALIDACIONES ---
+        if not usuarios:
+            errors.append("Debe haber al menos un usuario destinatario.")
+
         if not titulo:
             errors.append("El título es obligatorio.")
 
@@ -603,6 +605,7 @@ class Notificacion(ValidableModel):
             errors.append("Debe haber al menos un usuario destinatario.")
 
         return errors
+
 
 
 # NOTA DE ELIAS PARA LA CLASE NOTIFICACIONES:
