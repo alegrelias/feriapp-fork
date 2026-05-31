@@ -1107,6 +1107,10 @@ class ReseniaModelTest(TestCase):
 
     # --- update ---
 
+    """
+    las funciones de prueba siempre deben empezar con la palabra test_ para que el sistema las reconozca, 
+    y un return en el medio corta la ejecución de la prueba.
+    """
     def update(self, **kwargs):
 
         kwargs.setdefault("visitante", self.visitante)
@@ -1114,6 +1118,7 @@ class ReseniaModelTest(TestCase):
 
         return super().update(**kwargs)
 
+        #esto nunca se ejecuta pq pusiste un return antes
         errors = resenia.update(
             calificacion=5,
             comentario="¡Excelente evento!"
