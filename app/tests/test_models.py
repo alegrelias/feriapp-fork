@@ -384,20 +384,11 @@ class EmprendedorModelTest(TestCase):
             descripcion="Ferias artesanales"
         )
 
-        self.feria = Feria.objects.create(
-            nombre="Feria de Invierno",
-            categoria=self.categoria,
-            fecha_inicio=date(2026, 7, 1),
-            fecha_fin=date(2026, 7, 3),
-            ubicacion="Plaza Central",
-            capacidad_puestos=10,
-        )
-
         self.emprendedor = Emprendedor.objects.create(
             nombre="Jhon",
             apellido="Doe",
             email="doejhon@gmail.com",
-            rubro=self.feria,
+            rubro=self.categoria,
             telefono="+54-2901 532133",
             usuario=self.user
         )
@@ -405,7 +396,7 @@ class EmprendedorModelTest(TestCase):
     def test_str_retorna_nombre(self):
         self.assertEqual(str(self.emprendedor), "Jhon")
 
-    def test_listar_activos_ordenados(self):
+    def test_listar_ordenados(self):
         user2 = User.objects.create_user(
             username="patricio",
             email="estrella@gmail.com"
@@ -415,14 +406,14 @@ class EmprendedorModelTest(TestCase):
             nombre="Patricio",
             apellido="Arenas",
             email="arenas@gmail.com",
-            rubro=self.feria,
+            rubro=self.categoria,
             telefono="+54-2901 999999",
             usuario=user2
         )
 
-        lista_activos = Emprendedor.objects.listar_activos()
-        self.assertEqual(lista_activos[0], emprendedor_b)
-        self.assertEqual(lista_activos[1], self.emprendedor)
+        lista_ordenados = Emprendedor.objects.listar_ordenados()
+        self.assertEqual(lista_ordenados[0], emprendedor_b)
+        self.assertEqual(lista_ordenados[1], self.emprendedor)
 
 
     # --- validate ---
@@ -431,7 +422,7 @@ class EmprendedorModelTest(TestCase):
             nombre="Juan",
             apellido="Perez",
             email="jperez@gmail.com",
-            rubro=self.feria,
+            rubro=self.categoria,
             telefono="+54 2901 112233",
             usuario=self.user
         )
@@ -443,13 +434,13 @@ class EmprendedorModelTest(TestCase):
             nombre="",
             apellido="Perez",
             email="jperez@gmail.com",
-            rubro=self.feria,
+            rubro=self.categoria,
             telefono="+54 2901 112233",
             usuario=self.user
         )
         self.assertTrue(len(errors) > 0)
 
-    def test_validate_error_falta_feria(self):
+    def test_validate_error_falta_categoria(self):
         errors = Emprendedor.validate(
             nombre="Juan",
             apellido="Perez",
@@ -465,7 +456,7 @@ class EmprendedorModelTest(TestCase):
             nombre="Juan",
             apellido="Perez",
             email="jperez@gmail.com",
-            rubro=self.feria,
+            rubro=self.categoria,
             telefono="+54 2901 112233",
             usuario=None
         )
@@ -477,7 +468,7 @@ class EmprendedorModelTest(TestCase):
             nombre="Juan",
             apellido="Perez",
             email="jperez@gmail.com",
-            rubro=self.feria,
+            rubro=self.categoria,
             telefono="+54 2901 112233",
             usuario=self.user
         )
@@ -505,7 +496,7 @@ class EmprendedorModelTest(TestCase):
             nombre="Juan",
             apellido="Perez",
             email="jperez@hotmail.com",
-            rubro=self.feria,
+            rubro=self.categoria,
             telefono="+54 2901 556677",
             usuario=self.user
         )
@@ -665,7 +656,7 @@ class InscripcionModelTest(TestCase):
             nombre="Juan",
             apellido="Perez",
             email="jperez@gmail.com",
-            rubro=self.feria,
+            rubro=self.categoria,
             telefono="+54-2901 112233",
             usuario=self.user
         )
@@ -881,7 +872,7 @@ class InscripcionModelTest(TestCase):
             nombre="Pedro",
             apellido="Lopez",
             email="plopez@gmail.com",
-            rubro=self.feria,
+            rubro=self.categoria,
             telefono="+54-2901 999999",
             usuario=user2
         )

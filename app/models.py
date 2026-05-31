@@ -251,17 +251,17 @@ class Sector(ValidableModel):
 
 # Clase que nos permite manejar a los Emprendedores con los metodos que querramos
 class EmprendedorManager(models.Manager):
-    def listar_activos(self):
+    def listar_ordenados(self):
         return self.get_queryset().order_by('apellido', 'nombre')
 
     # Ejemplo de uso:
-    # lista_emprendedores = Emprendedor.objects.listar_activos()
+    # lista_emprendedores = Emprendedor.objects.listar_ordenados()
 
 class Emprendedor(ValidableModel):
     nombre = models.CharField(max_length=200)
     apellido = models.CharField(max_length=200)
     email = models.EmailField(max_length=254, unique=True)
-    rubro = models.ForeignKey(Feria, on_delete=models.CASCADE)
+    rubro = models.ForeignKey(Categoria, on_delete=models.SET_NULL, null=True)
     telefono = models.CharField(max_length=20, blank=True, null=True)
     usuario = models.ForeignKey(User, on_delete=models.CASCADE)
     objects = EmprendedorManager()
