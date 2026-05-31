@@ -1,6 +1,6 @@
 """Vistas públicas de la aplicación de ferias."""
 
-from django.views.generic import ListView, TemplateView
+from django.views.generic import ListView, TemplateView, DetailView
 
 from .models import Feria
 
@@ -11,7 +11,7 @@ class HomeView(TemplateView):
     template_name = "ferias/home.html"
 
 
-class ListaFeriasView(ListView):
+class FeriasListView(ListView):
     """Lista todas las ferias activas."""
 
     model = Feria
@@ -21,6 +21,11 @@ class ListaFeriasView(ListView):
     def get_queryset(self):
         """Retorna solo las ferias marcadas como activas."""
         return Feria.objects.filter(activa=True)
+
+class FeriasDetailView(DetailView):
+    model = Feria
+    template_name = 'ferias/ferias_detail_view.html'
+    context_object_name = 'feria'
 
 
 # TODO: implementar las siguientes vistas:

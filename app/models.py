@@ -453,7 +453,7 @@ class Inscripcion(ValidableModel):
                 # Validar consistencia con el estado
                 if estado_enviado is None:
                     # Caso A: El usuario no especificó estado pero metió un número de puesto
-                  errors.append("No se puede asignar un número de puesto si la inscripción no está en estado 'Confirmada'.")
+                    errors.append("No se puede asignar un número de puesto si la inscripción no está en estado 'Confirmada'.")
                 elif estado_efectivo in ["Lista_espera", "Cancelada"]:
                     # Caso B: El usuario explícitamente eligió un estado inválido para tener puesto
                     errors.append(f"No se puede asignar un número de puesto a una inscripción con estado '{estado_efectivo}'.")

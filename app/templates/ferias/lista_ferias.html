@@ -17,6 +17,7 @@
         <th>Fechas</th>
         <th>Ubicación</th>
         <th>Puestos</th>
+        <th>Acciones</th>
         <!-- TODO: agregar columna de acciones cuando implementen detalle_feria -->
       </tr>
     </thead>
@@ -30,6 +31,10 @@
         <td>
           <!-- TODO: completar con puestos_ocupados() cuando implementen Inscripcion -->
           <span class="badge bg-secondary">{{ feria.capacidad_puestos }} totales</span>
+        </td>
+        <td>
+          <a href="{% url 'ferias:detalle_feria' feria.pk%}" class="btn btn-sm btn-outline-primary">Ver Detalles</a>
+        </td>
         </td>
       </tr>
       {% empty %}
