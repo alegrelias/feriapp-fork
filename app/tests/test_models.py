@@ -11,6 +11,39 @@ from app.models import Categoria, Feria, Sector, Emprendedor, Visitante, Inscrip
 
 class CategoriaModelTest(TestCase):
 
+    def test_str_retorna_nombre(self):
+
+        categoria = Categoria.objects.create(nombre="Tecnologia", descripcion="Ferias tecnológicas")
+
+        self.assertEqual(str(categoria), "Tecnologia")
+
+    def test_cantidad_ferias_retorna_cantidad_correcta(self):
+
+        categoria = Categoria.objects.create(
+        nombre="Tecnologia",
+        descripcion="Ferias tecnológicas"
+        )
+
+        Feria.objects.create(
+            nombre="Feria 1",
+            categoria=categoria,
+            fecha_inicio=date(2026, 1, 1),
+            fecha_fin=date(2026, 1, 2),
+            ubicacion="Ushuaia",
+            capacidad_puestos=10
+        )
+
+        Feria.objects.create(
+            nombre="Feria 2",
+            categoria=categoria,
+            fecha_inicio=date(2026, 2, 1),
+            fecha_fin=date(2026, 2, 2),
+            ubicacion="Rio Grande",
+            capacidad_puestos=20
+        )
+
+        self.assertEqual(categoria.cantidad_ferias(), 2)
+
     def test_validate_datos_correctos_retorna_lista_vacia(self):
 
         errors = Categoria.validate(
@@ -110,6 +143,24 @@ class FeriaModelTest(TestCase):
 
     def test_tiene_lugar_true_con_capacidad_libre(self):
         self.assertTrue(self.feria.tiene_lugar())
+
+    def test_cantidad_sectores_retorna_cantidad_correcta(self):
+
+        Sector.objects.create(
+            feria=self.feria,
+            edicion=1,
+            nombre="Sector Norte",
+            capacidad_puestos=10
+        )
+
+        Sector.objects.create(
+            feria=self.feria,
+            edicion=1,
+            nombre="Sector Sur",
+            capacidad_puestos=15
+        )
+
+        self.assertEqual(self.feria.cantidad_sectores(), 2)
 
     # --- validate ---
 
@@ -241,6 +292,17 @@ class FeriaModelTest(TestCase):
         self.assertEqual(self.feria.nombre, "Feria de Invierno")  # sin cambios
 
 class SectorModelTest(TestCase):
+
+    def test_str_retorna_nombre(self):
+
+        sector = Sector.objects.create(
+            feria=self.feria,
+            edicion=1,
+            nombre="Sector Norte",
+            capacidad_puestos=10
+        )
+
+        self.assertEqual(str(sector), "Sector Norte - Feria Tech")
 
     def setUp(self):
 
