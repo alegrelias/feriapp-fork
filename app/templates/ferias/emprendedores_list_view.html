@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block title %}Emprendedores — FeriApp{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h2 class="h4">Directorio de Emprendedores</h2>
+</div>
+
+<div class="table-responsive">
+  <table class="table table-hover align-middle shadow-sm">
+    <thead class="table-success">
+      <tr>
+        <th>Nombre Completo</th>
+        <th>Rubro</th>
+        <th>Email</th>
+        <th>Teléfono</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for emprendedor in emprendedores %}
+      <tr>
+        <td class="fw-semibold">{{ emprendedor.nombre }} {{ emprendedor.apellido }}</td>
+        
+        <td><span class="badge bg-secondary">{{ emprendedor.rubro }}</span></td>
+        
+        <td><a href="mailto:{{ emprendedor.email }}" class="text-decoration-none">{{ emprendedor.email }}</a></td>
+        
+        <td>{{ emprendedor.telefono|default:"No registrado" }}</td>
+      </tr>
+      {% empty %}
+      <tr>
+        <td colspan="4" class="text-center text-muted py-4">No hay emprendedores registrados aún.</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

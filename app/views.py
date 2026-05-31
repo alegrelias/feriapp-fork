@@ -2,7 +2,7 @@
 
 from django.views.generic import ListView, TemplateView, DetailView
 
-from .models import Feria
+from .models import Feria, Emprendedor
 
 
 class HomeView(TemplateView):
@@ -10,6 +10,7 @@ class HomeView(TemplateView):
 
     template_name = "ferias/home.html"
 
+# ========== Vistas para Ferias ==========
 
 class FeriasListView(ListView):
     """Lista todas las ferias activas."""
@@ -27,10 +28,18 @@ class FeriasDetailView(DetailView):
     template_name = 'ferias/ferias_detail_view.html'
     context_object_name = 'feria'
 
+# ========== Vistas para Emprendedores ==========
+
+class EmprendedoresListView(ListView):
+    model = Emprendedor
+    template_name = 'ferias/emprendedores_list_view.html'
+    context_object_name = 'emprendedores'
+
+    def get_queryset(self):
+        """Retorna los emprendedores activos"""
+        return Emprendedor.objects.listar_ordenados()
 
 # TODO: implementar las siguientes vistas:
-# class DetalleFeriaView(DetailView): ...
 # class NuevaFeriaView(CreateView): ...
-# class ListaEmprendedoresView(ListView): ...
 # class NuevaInscripcionView(CreateView): ...
 # class CancelarInscripcionView(View): ...
