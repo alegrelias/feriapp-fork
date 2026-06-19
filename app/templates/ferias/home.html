@@ -5,13 +5,48 @@
 {% block content %}
 <div class="row mb-4">
   <div class="col">
-    <h1 class="h3">Panel de inicio</h1>
+    <h1 class="h3">Home</h1>
     <p class="text-muted">Bienvenido al sistema de gestión de ferias y emprendedores.</p>
   </div>
 </div>
 
 <!-- TODO: reemplazar con estadísticas reales del contexto -->
 <div class="row g-3">
+   <div class="col-md-3">
+      <div class="card text-white bg-primary">
+        <div class="card-body">
+          <h5 class="card-title">Ferias activas</h5>
+          <p class="card-text fs-2">{{ total_ferias_activas }}</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-3">
+      <div class="card text-white bg-success">
+        <div class="card-body">
+          <h5 class="card-title">Emprendedores</h5>
+          <p class="card-text fs-2">{{ total_emprendedores }}</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-3">
+      <div class="card text-white bg-primary">
+        <div class="card-body">
+          <h5 class="card-title">Ferias proximas</h5>
+          <p class="card-text fs-2">{{ ferias_proximas }}</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-3">
+      <div class="card text-white bg-success">
+        <div class="card-body">
+          <h5 class="card-title">Inscripciones </h5>
+          <p class="card-text fs-2">{{ inscripciones_confirmadas }}</p>
+        </div>
+      </div>
+    </div>
 
 </div>
 {% endblock %}

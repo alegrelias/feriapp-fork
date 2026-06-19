@@ -382,7 +382,7 @@ class Inscripcion(ValidableModel):
         registrado_por = models.CharField(max_length=100)
 
         #vinculo el manager
-        objects = InscripcionManager()
+        
         class Meta:
             #para el panel de admin
             verbose_name_plural = "Inscripciones"

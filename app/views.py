@@ -1,14 +1,29 @@
 """Vistas públicas de la aplicación de ferias."""
 
 from django.views.generic import ListView, TemplateView, DetailView
+from django.utils import timezone
 
-from .models import Feria, Emprendedor
+from .models import Feria, Emprendedor,Inscripcion
 
 
 class HomeView(TemplateView):
     """Vista de inicio. Por ahora vacía — completar con estadísticas."""
 
     template_name = "ferias/home.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        hoy = timezone.now().date()
+
+        context["total_ferias_activas"] = Feria.objects.filter(activa=True).count()
+        context["total_emprendedores"] = Emprendedor.objects.count()
+
+        #__gte greater than or equal 
+        context["ferias_proximas"] = Feria.objects.filter(fecha_inicio__gte=hoy).count()
+        context["inscripciones_confirmadas"] = Inscripcion.objects.filter(estado="Confirmada").count()
+
+        return context
+
 
 # ========== Vistas para Ferias ==========
 
