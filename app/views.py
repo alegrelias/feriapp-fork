@@ -4,6 +4,7 @@ from django.views.generic import ListView, TemplateView, DetailView, CreateView
 from django.contrib.auth.forms import UserCreationForm
 from django.urls import reverse_lazy
 from django.utils import timezone
+from django.contrib.auth.mixins import LoginRequiredMixin
 
 from .models import Feria, Emprendedor,Inscripcion
 
@@ -29,7 +30,7 @@ class HomeView(TemplateView):
 
 # ========== Vistas para Ferias ==========
 
-class FeriasListView(ListView):
+class FeriasListView(LoginRequiredMixin, ListView):
     """Lista todas las ferias activas."""
 
     model = Feria
@@ -40,14 +41,14 @@ class FeriasListView(ListView):
         """Retorna solo las ferias marcadas como activas."""
         return Feria.objects.filter(activa=True)
 
-class FeriasDetailView(DetailView):
+class FeriasDetailView(LoginRequiredMixin, DetailView):
     model = Feria
     template_name = 'ferias/ferias_detail_view.html'
     context_object_name = 'feria'
 
 # ========== Vistas para Emprendedores ==========
 
-class EmprendedoresListView(ListView):
+class EmprendedoresListView(LoginRequiredMixin, ListView):
     model = Emprendedor
     template_name = 'ferias/emprendedores_list_view.html'
     context_object_name = 'emprendedores'
