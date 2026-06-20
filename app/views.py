@@ -1,6 +1,8 @@
 """Vistas públicas de la aplicación de ferias."""
 
-from django.views.generic import ListView, TemplateView, DetailView
+from django.views.generic import ListView, TemplateView, DetailView, CreateView
+from django.contrib.auth.forms import UserCreationForm
+from django.urls import reverse_lazy
 from django.utils import timezone
 
 from .models import Feria, Emprendedor,Inscripcion
@@ -58,3 +60,8 @@ class EmprendedoresListView(ListView):
 # class NuevaFeriaView(CreateView): ...
 # class NuevaInscripcionView(CreateView): ...
 # class CancelarInscripcionView(View): ...
+
+class RegistroUsuarioView(CreateView):
+    template_name = 'ferias/registration/registro.html'
+    form_class = UserCreationForm
+    success_url = reverse_lazy('ferias:login')

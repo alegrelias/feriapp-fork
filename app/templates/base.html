@@ -27,9 +27,14 @@
         </ul>
 
         <div class="d-flex align-items-center ms-lg-3 mt-3 mt-lg-0 gap-2">
-          <a href="#" class="btn btn-outline-light btn-sm px-3">Iniciar Sesión</a>
-          
-          <a href="#" class="btn btn-outline-warning btn-sm px-3">Cerrar Sesión</a>
+          {% if user.is_authenticated %}
+            <form action="{% url 'ferias:logout' %}" method="post">
+              {% csrf_token %}
+              <button type="submit" class="btn btn-outline-warning btn-sm px-3">Cerrar Sesión</button>
+            </form>
+          {% else %}
+          <a href="{% url 'ferias:login' %}" class="btn btn-outline-light btn-sm px-3">Iniciar Sesión</a>
+          {% endif %}
         </div>
 
       </div>

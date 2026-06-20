@@ -15,7 +15,8 @@ urlpatterns = [
     # path("ferias/nueva/", views.NuevaFeriaView.as_view(), name="nueva_feria"),
     # path("inscripciones/nueva/", views.NuevaInscripcionView.as_view(), name="nueva_inscripcion"),
 
-    #LOGIN y LOGOUT
-    path('login/', auth_views.LoginView.as_view(template_name='registration/login.html'), name='login'),
-    path('logout/', auth_views.LogoutView.as_view(next_page='ferias:home'), name='logout')
+    #LOGIN, LOGOUT y REGISTRO
+    path('login/', auth_views.LoginView.as_view(template_name='ferias/registration/login.html', redirect_authenticated_user=True), name='login'),
+    path('logout/', auth_views.LogoutView.as_view(next_page='ferias:home'), name='logout'),
+    path('registro/', views.RegistroUsuarioView.as_view(), name='registro'),
 ]

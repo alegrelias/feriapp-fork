@@ -73,3 +73,6 @@ STATIC_URL = "static/"
 STATICFILES_DIRS = [BASE_DIR / "static"]
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+# Redirigir al inicio después de un login exitoso
+LOGIN_REDIRECT_URL = 'ferias:home'

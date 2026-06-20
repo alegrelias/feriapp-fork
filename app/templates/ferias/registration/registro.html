@@ -1,13 +1,13 @@
 {% extends "base.html" %}
 
-{% block title %}Iniciar Sesión — FeriApp{% endblock %}
+{% block title %}Crear Cuenta — FeriApp{% endblock %}
 
 {% block content %}
 <div class="row justify-content-center mt-5">
-    <div class="col-md-5">
+    <div class="col-md-6">
         <div class="card shadow-sm">
             <div class="card-header bg-success text-white text-center py-3">
-                <h3 class="mb-0">Iniciar Sesión</h3>
+                <h3 class="mb-0">Registrarse en FeriApp</h3>
             </div>
             <div class="card-body p-4">
                 
@@ -16,14 +16,14 @@
                     {{ form.as_p }}
                     
                     <div class="d-grid gap-2 mt-4">
-                        <button type="submit" class="btn btn-success">Ingresar</button>
+                        <button type="submit" class="btn btn-success">Crear Cuenta</button>
                     </div>
                 </form>
 
             </div>
             <div class="card-footer text-center bg-light py-3">
-                <span class="text-muted fs-6">¿No tenés cuenta?</span>
-                <a href="{% url 'ferias:registro' %}" class="btn btn-sm btn-outline-success ms-2">Registrarse</a>
+                <span class="text-muted fs-6">¿Ya tenés una cuenta?</span>
+                <a href="{% url 'ferias:login' %}" class="btn btn-sm btn-outline-secondary ms-2">Iniciar Sesión</a>
             </div>
         </div>
     </div>
