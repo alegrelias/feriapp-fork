@@ -66,7 +66,7 @@ class Feria(ValidableModel):#<- ya no heredamos de models.Models sino de Validab
     def puestos_ocupados(self):
         """Retorna la cantidad de inscripciones confirmadas."""
 
-        return 0
+        return self.inscripciones_feria.filter(estado="Confirmada").count()
 
     def puestos_disponibles(self):
         """Retorna los puestos libres."""

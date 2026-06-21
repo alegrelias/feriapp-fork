@@ -20,7 +20,37 @@
                 
                 <h5 class="mt-3">Disponibilidad</h5>
                 <p><strong>Capacidad Total:</strong> {{ feria.capacidad_puestos }} puestos</p>
-                
+                <p class="mb-2"><strong>Puestos ocupados:</strong> {{ feria.puestos_ocupados }}</p>
+
+                <div class="progress mb-3" style="height: 20px;">
+                    <div 
+                        class="progress-bar bg-success" 
+                        role="progressbar" 
+                        style="--progress-width: {{ ocupacion }}%; width: var(--progress-width);"
+                        aria-valuenow="{{ ocupacion }}" 
+                        aria-valuemin="0" 
+                        aria-valuemax="100"
+                    >
+                        <span class="fw-bold">{{ ocupacion|floatformat:0 }}%</span>
+                    </div>
+                </div>
+
+                <h5 class="mt-4 mb-3">Emprendedores participantes</h5>
+
+                <ul class="list-group">
+                    {% for inscripcion in inscripciones %}
+                        <li class="list-group-item d-flex align-items-center">
+                            <span class="fw-semibold">
+                                {{ inscripcion.emprendedor.nombre }} {{ inscripcion.emprendedor.apellido }}
+                            </span>
+                        </li>
+                    {% empty %}
+                        <li class="list-group-item text-center text-muted py-3">
+                            No hay emprendedores inscriptos en esta feria.
+                        </li>
+                    {% endfor %}
+                </ul>
+
                 <p><strong>Puestos Libres:</strong> {{ feria.puestos_disponibles }}</p>
                 
                 {% if feria.tiene_lugar %}
