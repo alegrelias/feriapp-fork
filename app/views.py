@@ -6,7 +6,7 @@ from django.urls import reverse_lazy
 from django.utils import timezone
 from django.contrib.auth.mixins import LoginRequiredMixin
 
-from .models import Feria, Emprendedor,Inscripcion
+from .models import Feria, Emprendedor,Inscripcion, Categoria
 
 
 class HomeView(TemplateView):
@@ -39,12 +39,42 @@ class FeriasListView(LoginRequiredMixin, ListView):
 
     def get_queryset(self):
         """Retorna solo las ferias marcadas como activas."""
-        return Feria.objects.filter(activa=True)
+        queryset = Feria.objects.filter(activa=True)
+
+        categoria_id = self.request.GET.get("categoria")
+
+        if categoria_id:
+            queryset = queryset.filter(categoria_id=categoria_id)
+
+        return queryset
+
+    def get_context_data(self, **kwargs):
+
+        context = super().get_context_data(**kwargs)
+
+        context["categorias"] = Categoria.objects.all()
+
+        return context
 
 class FeriasDetailView(LoginRequiredMixin, DetailView):
     model = Feria
     template_name = 'ferias/ferias_detail_view.html'
     context_object_name = 'feria'
+
+    def get_context_data(self, **kwargs):
+
+        context = super().get_context_data(**kwargs)
+
+        inscripciones = Inscripcion.objects.filter(
+            feria=self.object,
+            estado="Confirmada"
+        )
+
+        context["inscripciones"] = inscripciones
+
+        context["ocupacion"] = (self.object.puestos_ocupados() * 100) / self.object.capacidad_puestos
+
+        return context
 
 # ========== Vistas para Emprendedores ==========
 
@@ -59,6 +89,32 @@ class EmprendedoresListView(LoginRequiredMixin, ListView):
 
 # TODO: implementar las siguientes vistas:
 # class NuevaFeriaView(CreateView): ...
+
+class NuevaFeriaView(LoginRequiredMixin, CreateView):
+
+    model = Feria
+
+    fields = ["nombre","categoria","fecha_inicio","fecha_fin","ubicacion","capacidad_puestos","activa",]
+
+    template_name = "ferias/nueva_feria.html"
+
+    success_url = reverse_lazy("ferias:lista_ferias")
+
+    def get_form(self, form_class=None):
+        form = super().get_form(form_class)
+        
+        form.fields['categoria'].empty_label = "Seleccione una categoría"
+        
+        for field_name, field in form.fields.items():
+            if field_name == 'categoria':
+                field.widget.attrs.update({'class': 'form-select'})
+            elif field_name == 'activa':
+                field.widget.attrs.update({'class': 'form-check-input'})
+            else:
+                field.widget.attrs.update({'class': 'form-control'})
+                
+        return form
+
 # class NuevaInscripcionView(CreateView): ...
 # class CancelarInscripcionView(View): ...
 
