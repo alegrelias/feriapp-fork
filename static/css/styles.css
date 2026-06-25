@@ -1,12 +1,68 @@
 :root {
-    --bs-primary: #1a3a5c;
+    --bs-blue: #1a3a5c;
     --bs-primary-rgb: 26, 58, 92;
     --hover-primary: #2d4d72;
     --color-hueso: #fdf6e3;
+
+    --ft-primary: #5B4FCF;
+    --ft-action:  #7C6FE0;
+    --ft-bg:      #F7F7FB;
+    --ft-accent:  #06B6A2;
+    --ft-text:    #1A1A2E;
+    --ft-muted:   #7B7B9A;
+    --ft-border:  #E4E4F0;
 }
 
-.card {
-    background-color: var(--bs-primary);
+.navbar-feriapp {
+    background-color: var(--ft-text) !important;
+}
+
+.navbar-feriapp .navbar-brand {
+    color: white;
+    font-weight: 500;
+    letter-spacing: -0.3px;
+}
+
+.navbar-feriapp .nav-link {
+    color: rgba(255, 255, 255, 0.45);
+}
+
+.navbar-feriapp .nav-link:hover,
+.navbar-feriapp .nav-link.active {
+    color: white;
+}
+
+.navbar-feriapp .btn-nav-primary {
+    background-color: var(--ft-primary);
+    color: white;
+    border: none;
+    border-radius: 20px;
+    font-size: 12px;
+    padding: 4px 14px;
+    font-weight: 500;
+}
+
+.navbar-feriapp .btn-nav-outline {
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    color: rgba(255, 255, 255, 0.7);
+    border-radius: 20px;
+    font-size: 12px;
+    padding: 4px 14px;
+    background: transparent;
+}
+
+.navbar-feriapp .btn-nav-outline:hover {
+    border-color: white;
+    color: white;
+}
+
+body {
+    background-color: var(--ft-bg);
+    color: var(--ft-text);
+}
+
+.card-container{
+    background-color: var(--ft-bg);
     border-color: #1a3a5c;
     color: var(--color-hueso);
 }
