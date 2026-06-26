@@ -6,7 +6,7 @@ from django.urls import reverse_lazy
 from django.utils import timezone
 from django.contrib.auth.mixins import LoginRequiredMixin
 
-from .models import Feria, Emprendedor,Inscripcion, Categoria
+from .models import Feria, Emprendedor,Inscripcion, Categoria,Resenia
 
 
 class HomeView(TemplateView):
@@ -24,7 +24,7 @@ class HomeView(TemplateView):
         #__gte greater than or equal 
         context["ferias_proximas"] = Feria.objects.filter(fecha_inicio__gte=hoy).count()
         context["inscripciones_confirmadas"] = Inscripcion.objects.filter(estado="Confirmada").count()
-        
+        context["resenias"] = Resenia.objects.all()[:5]
         context["ferias_activas"] = Feria.objects.filter(activa=True).order_by("fecha_inicio")[:5]
         return context
 

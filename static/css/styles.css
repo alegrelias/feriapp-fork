@@ -70,12 +70,14 @@ body {
     background-color: var(--ft-transparent);
     border-color: var(--ft-transparent);
     color: var(--ft-primary);
+   
 }
 
 .card-container{
     background-color: var(--ft-bg);
     border-color: #1a3a5c;
     color: var(--color-hueso);
+
 }
 
 .card-home:hover {

@@ -7,32 +7,32 @@
 
 {% if not user.is_authenticated %}
     <!-- esto solo lo ve quien no inició sesión -->
-    <div class="container">
-      <div class="row mb-4 g-6">
-        <div class="col-6">
+    <div class="container  g-5">
+      <div class="row mb-4 justify-content-space-between ">
+        <div class="col-6 col-md-7">
           <h1 class="h3">Descubrí ferias y emprendedores cerca tuyo</h1>
           <p class="text-muted"> Explorá las ferias activas, conocé los emprendedores
-                  y dejá tu reseña como asistente.</p>
+                  y dejá tu reseña como asist ente.</p>
           <p style="color: var(--ft-muted); font-size: 14px;">
           <a href="{% url 'ferias:login' %}" style="color: var(--ft-primary);">Iniciá sesión</a>
           para acceder a todas las funciones.
         </div>
         
-            <div class="col-3">
+            <div class="col-3 col-md-2 ">
               <div class="card card-unauth ">
                 <div class="card-body">
                   <p class="card-text fs-2">{{ total_ferias_activas }}</p>
-                  <p class="card-title">Ferias</p>
+                  <p class="card-title">Ferias </p>
 
                 </div>
-              </div>
+              </div>     
             </div>
-            <div class="col-3">
-              <div class="card card-unauth">
+            <div class="col-3 col-md-2">
+              <div class="card card-unauth h-70">
                 <div class="card-body">
                   
                   <p class="card-text fs-2">{{ total_emprendedores }}</p>
-                  <p class="card-title">Emprendedores</p>
+                  <p class="card-title">Emprendedores </p>
                 </div>
               </div>
             </div>
@@ -85,5 +85,50 @@
 
   </div>
 </div>  
+
+<div class="container">
+<div class="row">
+  <div class="col">
+    <div class="card">
+      <div class="card-body">
+        <div class="card-title">Próximas ferias</div>
+        {% for feria in ferias_activas %}
+          <div class="card">
+            <div class="card-body">
+              <div class="card-title">{{ feria.nombre }}</div>
+              <div class="card-text">{{ feria.fecha_inicio }}-{{ feria.fecha_fin }}</div>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+  <div class="col">
+    <div class="card">
+    <div class="card-header">
+        Reseñas recientes
+    </div>
+    <div class="card-body p-0">
+       {% for resenia in resenias %}
+<div class="d-flex align-items-start gap-2 p-3 border-bottom">
+    <div class="d-flex flex-column flex-grow-1">
+        <div class="d-flex justify-content-between align-items-center">
+            <span class="fw-500" style="font-size:13px; color: var(--ft-text);">{{ resenia.visitante.nombre }} {{ resenia.visitante.apellido }}</span>
+            <span style="color: var(--ft-accent); font-size:12px;">
+                {% for i in "12345" %}
+                    {% if forloop.counter <= resenia.calificacion %}★{% else %}☆{% endif %}
+                {% endfor %}
+            </span>
+        </div>
+        <span style="font-size:11px; color: var(--ft-muted);">{{ resenia.feria.nombre }}</span>
+        <p class="mb-0 mt-1" style="font-size:12px; color: var(--ft-muted);">{{ resenia.comentario }}</p>
+    </div>
+</div>
+{% endfor %}
+    </div>
+</div>             
+  </div>
+</div>
+</div>
 
 {% endblock %}
