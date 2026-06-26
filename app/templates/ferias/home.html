@@ -3,51 +3,81 @@
 {% block title %}Inicio — FeriApp{% endblock %}
 
 {% block content %}
-<div class="row mb-4">
-  <div class="col">
-    <h1 class="h3">Home</h1>
-    <p class="text-muted">Bienvenido al sistema de gestión de ferias y emprendedores.</p>
-  </div>
-</div>
 
-{% if user.is_authenticated %}
-    <!-- esto solo lo ve quien inició sesión -->
+
+{% if not user.is_authenticated %}
+    <!-- esto solo lo ve quien no inició sesión -->
+    <div class="container">
+      <div class="row mb-4 g-6">
+        <div class="col-6">
+          <h1 class="h3">Descubrí ferias y emprendedores cerca tuyo</h1>
+          <p class="text-muted"> Explorá las ferias activas, conocé los emprendedores
+                  y dejá tu reseña como asistente.</p>
+          <p style="color: var(--ft-muted); font-size: 14px;">
+          <a href="{% url 'ferias:login' %}" style="color: var(--ft-primary);">Iniciá sesión</a>
+          para acceder a todas las funciones.
+        </div>
+        
+            <div class="col-3">
+              <div class="card card-unauth ">
+                <div class="card-body">
+                  <p class="card-text fs-2">{{ total_ferias_activas }}</p>
+                  <p class="card-title">Ferias</p>
+
+                </div>
+              </div>
+            </div>
+            <div class="col-3">
+              <div class="card card-unauth">
+                <div class="card-body">
+                  
+                  <p class="card-text fs-2">{{ total_emprendedores }}</p>
+                  <p class="card-title">Emprendedores</p>
+                </div>
+              </div>
+            </div>
+        </div>
+      </div>
+    </div>
 
 {% else %}
+
+
+{% endif %}
 <!-- TODO: reemplazar con estadísticas reales del contexto -->
- <div class="card-container col-12 ">
+ <div class="card-container  ">
   <div class="row g-3">
-    <div class="col-md-3">
-        <div class="card text-white bg-primary">
+    <div class="col-12 col-md-3">
+        <div class="card card-home text-white bg-primary">
           <div class="card-body">
-            <h5 class="card-title">Ferias activas</h5>
+            <h5 class="card-title">🏪Ferias activas</h5>
             <p class="card-text fs-2">{{ total_ferias_activas }}</p>
           </div>
         </div>
       </div>
 
       <div class="col-md-3 ">
-        <div class="card text-white bg-success">
+        <div class="card card-home text-white bg-success">
           <div class="card-body">
-            <h5 class="card-title flex-grow-1">Emprendedores</h5>
+            <h5 class="card-title flex-grow-1">👥Emprendedores</h5>
             <p class="card-text fs-2">{{ total_emprendedores }}</p>
           </div>
         </div>
       </div>
 
       <div class="col-md-3">
-        <div class="card text-white bg-primary">
+        <div class="card card-home text-white bg-primary">
           <div class="card-body">
-            <h5 class="card-title">Ferias proximas</h5>
+            <h5 class="card-title">📅Ferias proximas</h5>
             <p class="card-text fs-2">{{ ferias_proximas }}</p>
           </div>
         </div>
       </div>
 
       <div class="col-md-3">
-        <div class="card text-white bg-success">
+        <div class="card card-home text-white bg-success">
           <div class="card-body">
-            <h5 class="card-title">Inscripciones </h5>
+            <h5 class="card-title">📋Inscripciones </h5>
             <p class="card-text fs-2">{{ inscripciones_confirmadas }}</p>
           </div>
         </div>
@@ -55,5 +85,5 @@
 
   </div>
 </div>  
-{% endif %}
+
 {% endblock %}

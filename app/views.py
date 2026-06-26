@@ -10,7 +10,7 @@ from .models import Feria, Emprendedor,Inscripcion, Categoria
 
 
 class HomeView(TemplateView):
-    """Vista de inicio. Por ahora vacía — completar con estadísticas."""
+    """Vista de inicio. completar con estadísticas."""
 
     template_name = "ferias/home.html"
 
@@ -24,7 +24,8 @@ class HomeView(TemplateView):
         #__gte greater than or equal 
         context["ferias_proximas"] = Feria.objects.filter(fecha_inicio__gte=hoy).count()
         context["inscripciones_confirmadas"] = Inscripcion.objects.filter(estado="Confirmada").count()
-
+        
+        context["ferias_activas"] = Feria.objects.filter(activa=True).order_by("fecha_inicio")[:5]
         return context
 
 

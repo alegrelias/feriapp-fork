@@ -1,16 +1,21 @@
-:root {
+ :root {
     --bs-blue: #1a3a5c;
     --bs-primary-rgb: 26, 58, 92;
     --hover-primary: #2d4d72;
     --color-hueso: #fdf6e3;
 
     --ft-primary: #5B4FCF;
+    --ft-transparent: #d5d0fd;
     --ft-action:  #7C6FE0;
     --ft-bg:      #F7F7FB;
     --ft-accent:  #06B6A2;
     --ft-text:    #1A1A2E;
     --ft-muted:   #7B7B9A;
     --ft-border:  #E4E4F0;
+}
+
+a{
+    text-decoration: none;
 }
 
 .navbar-feriapp {
@@ -24,7 +29,7 @@
 }
 
 .navbar-feriapp .nav-link {
-    color: rgba(255, 255, 255, 0.45);
+    color:var(--ft-action);
 }
 
 .navbar-feriapp .nav-link:hover,
@@ -43,15 +48,15 @@
 }
 
 .navbar-feriapp .btn-nav-outline {
-    border: 1px solid rgba(255, 255, 255, 0.25);
-    color: rgba(255, 255, 255, 0.7);
+    border: 1px solid var(--ft-text);
+    color: var(--ft-muted);
     border-radius: 20px;
     font-size: 12px;
     padding: 4px 14px;
     background: transparent;
 }
 
-.navbar-feriapp .btn-nav-outline:hover {
+.navbar-feriapp .btn-nav-outline:hover  {
     border-color: white;
     color: white;
 }
@@ -61,13 +66,19 @@ body {
     color: var(--ft-text);
 }
 
+.card-unauth{
+    background-color: var(--ft-transparent);
+    border-color: var(--ft-transparent);
+    color: var(--ft-primary);
+}
+
 .card-container{
     background-color: var(--ft-bg);
     border-color: #1a3a5c;
     color: var(--color-hueso);
 }
 
-.card:hover {
+.card-home:hover {
     background-color: var(--hover-primary) !important;  /* importan para que ignorre estilos de bootstrap*/
     border-color: #142d4a;
     color: var(--color-hueso);
