@@ -2,13 +2,14 @@
     --bs-blue: #1a3a5c;
     --bs-primary-rgb: 26, 58, 92;
     --hover-primary: #2d4d72;
-    --color-hueso: #fdf6e3;
+    --color-hueso: #fffffa;
 
     --ft-primary: #5B4FCF;
     --ft-transparent: #d5d0fd;
     --ft-action:  #7C6FE0;
     --ft-bg:      #F7F7FB;
     --ft-accent:  #06B6A2;
+    --ft-accent-transparent:#ebe8e5;
     --ft-text:    #1A1A2E;
     --ft-muted:   #7B7B9A;
     --ft-border:  #E4E4F0;
@@ -66,6 +67,13 @@ body {
     color: var(--ft-text);
 }
 
+/* ========== HOME ========== */
+
+.hero-main{
+    background-color: var(--color-hueso);
+    border-radius: 8px;
+}
+
 .card-unauth{
     background-color: var(--ft-transparent);
     border-color: var(--ft-transparent);
@@ -80,9 +88,50 @@ body {
 
 }
 
-.card-home:hover {
-    background-color: var(--hover-primary) !important;  /* importan para que ignorre estilos de bootstrap*/
-    border-color: #142d4a;
+
+
+.home-title {
+    color: var(--ft-text);
+    font-size: 1.25rem;
+}
+
+.home-subtitle {
+    color: var(--ft-muted);
+    font-size: 14px;
+}
+
+/* ========== STAT CARDS ========== */
+.stat-card {
+    background: var(--ft-accent-transparent);
+    border-radius: 12px;
+    border: 0.5px solid var(--ft-border);
+    padding: 16px;
+    position: relative;
+    overflow: hidden;
+}
+
+.stat-card:hover {
+    
+    border-color: var(--color-hueso);
     color: var(--color-hueso);
     cursor: pointer;
+}
+
+.stat-card.c1 { border-top: 2px solid var(--ft-primary); }
+.stat-card.c2 { border-top: 2px solid var(--ft-action); }
+.stat-card.c3 { border-top: 2px solid var(--ft-accent); }
+.stat-card.c4 { border-top: 2px solid #9B59B6; }
+
+.stat-num {
+    font-size: 28px;
+    font-weight: 500;
+    color: var(--ft-text);
+    letter-spacing: -1px;
+    line-height: 1;
+    margin-bottom: 4px;
+}
+
+.stat-label {
+    font-size: 17px;
+    color: var(--ft-muted);
 }

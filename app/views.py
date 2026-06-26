@@ -6,7 +6,7 @@ from django.urls import reverse_lazy
 from django.utils import timezone
 from django.contrib.auth.mixins import LoginRequiredMixin
 
-from .models import Feria, Emprendedor,Inscripcion, Categoria,Resenia
+from .models import Feria, Emprendedor,Inscripcion, Categoria,Resenia,Visitante
 
 
 class HomeView(TemplateView):
@@ -27,6 +27,25 @@ class HomeView(TemplateView):
         context["resenias"] = Resenia.objects.all()[:5]
         context["ferias_activas"] = Feria.objects.filter(activa=True).order_by("fecha_inicio")[:5]
         return context
+
+
+class PerfilView(LoginRequiredMixin,TemplateView):
+    template_name = "perfil.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        emprendedor = Emprendedor.objects.filter(usuario=self.request.user).first()
+        visitante = Visitante.objects.filter(usuario=self.request.user).first()
+        
+        if emprendedor:
+            context["perfil"] = emprendedor
+            context["tipo"] = "emprendedor"
+        elif visitante:
+            context["perfil"] = visitante
+            context["tipo"] = "visitante"
+        
+        return context
+
 
 
 # ========== Vistas para Ferias ==========
