@@ -77,6 +77,14 @@ body {
     border-radius: 8px;
 }
 
+.hero-auth{
+    background-color: white;
+    border-radius: 8px;
+   
+border-top: 2px solid var(--ft-primary); 
+}
+
+
 .card-unauth{
     background-color: var(--ft-transparent);
     border-color: var(--ft-transparent);
@@ -106,6 +114,7 @@ body {
 /* ========== STAT CARDS ========== */
 .stat-card {
     background: var(--ft-accent-transparent);
+    background-color: white;
     border-radius: 12px;
     border: 0.5px solid var(--ft-border);
     padding: 16px;
@@ -120,10 +129,10 @@ body {
     cursor: pointer;
 }
 
-.stat-card.c1 { border-top: 2px solid var(--ft-primary); }
-.stat-card.c2 { border-top: 2px solid var(--ft-action); }
-.stat-card.c3 { border-top: 2px solid var(--ft-accent); }
-.stat-card.c4 { border-top: 2px solid #9B59B6; }
+.stat-card.c1 { border-top: 2px solid var(--ft-primary-transparent); }
+.stat-card.c2 { border-top: 2px solid var(--ft-primary-transparent); }
+.stat-card.c3 { border-top: 2px solid var(--ft-primary-transparent); }
+.stat-card.c4 { border-top: 2px solid var(--ft-primary-transparent); }
 
 .stat-num {
     font-size: 28px;
@@ -146,7 +155,40 @@ body {
     color: var(--ft-text);
     font-weight: 500;
 }
+/* ========== LISTA FERIAS ========== */
 
+.btn-feria {
+    background-color: var(--ft-accent);
+    color: white;
+    border: none;
+    border-radius: 8px;
+}
+
+.btn-feria:hover {
+    background-color: #0d9e8d;
+    color: white;
+}
+
+.btn-outline-feria {
+    border: 1px solid var(--ft-primary);
+    color: var(--ft-primary);
+    border-radius: 8px;
+    background: transparent;
+}
+
+.btn-outline-feria:hover {
+    background-color: var(--ft-primary-transparent);
+    color: white;
+}
+
+.badge-feria {
+    background: #EEEDFE;
+    color: var(--ft-primary);
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 500;
+    padding: 3px 10px;
+}
 /* ========== FERIA DETAIL ========== */
 
 .card-detail-feria{
@@ -186,4 +228,5 @@ body {
 
 .resenia-detail-feria-header{
     background-color: var(--ft-primary-transparent2);
+    color: var(--ft-primary);
 }
