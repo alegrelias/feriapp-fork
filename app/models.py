@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 from datetime import date
-
+from django.utils import timezone
 
 from django.db import models
 from app.base_models import ValidableModel
@@ -112,6 +112,18 @@ class Feria(ValidableModel):#<- ya no heredamos de models.Models sino de Validab
         capacidad_puestos = kwargs.get("capacidad_puestos")
         fecha_inicio = kwargs.get("fecha_inicio")
         fecha_fin = kwargs.get("fecha_fin")
+
+        hoy = timezone.now().date()
+
+        if fecha_inicio and fecha_inicio < hoy:
+            errors.append(
+                "La fecha de inicio no puede ser anterior a la fecha actual."
+            )
+
+        if fecha_inicio and fecha_fin and fecha_fin < fecha_inicio:
+            errors.append(
+                "La fecha de fin no puede ser anterior a la fecha de inicio."
+            )
 
         if not nombre:
             errors.append("El nombre es obligatorio.")
