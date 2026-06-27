@@ -382,7 +382,7 @@ class InscripcionManager(models.Manager):
 
 
 class Inscripcion(ValidableModel):
-
+        
         emprendedor = models.ForeignKey(Emprendedor, on_delete= models.CASCADE, related_name='inscripciones_emprendedor')
         #que pasa si feria se borra?, null y blank quedan por defecto en false si no se colocan
         feria = models.ForeignKey(Feria, on_delete= models.CASCADE, related_name='inscripciones_feria')
