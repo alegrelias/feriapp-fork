@@ -84,19 +84,19 @@ class Feria(ValidableModel):#<- ya no heredamos de models.Models sino de Validab
         """Retorna la cantidad de sectores asociados."""
 
         return self.sectores.count()
-    
-    def en_curso(self):
-        hoy = date.today() 
 
-        return  hoy >= self.fecha_inicio and hoy <= self.fecha_fin  
-    
+    def en_curso(self):
+        hoy = date.today()
+
+        return  hoy >= self.fecha_inicio and hoy <= self.fecha_fin
+
     def a_comenzar(self):
-        hoy = date.today() 
+        hoy = date.today()
 
         return  hoy < self.fecha_inicio
-    
+
     def finalizada(self):
-        hoy = date.today() 
+        hoy = date.today()
 
         return  hoy > self.fecha_fin
 
@@ -399,7 +399,7 @@ class Inscripcion(ValidableModel):
         registrado_por = models.CharField(max_length=100)
 
         #vinculo el manager
-        
+
         class Meta:
             #para el panel de admin
             verbose_name_plural = "Inscripciones"
@@ -471,7 +471,7 @@ class Inscripcion(ValidableModel):
                 if estado_enviado is None:
                     # Caso A: El usuario no especificó estado pero metió un número de puesto
                     errors.append("No se puede asignar un número de puesto si la inscripción no está en estado 'Confirmada'.")
-                elif estado_efectivo in ["Lista_espera", "Cancelada"]:
+                elif estado_efectivo in ["Cancelada"]:
                     # Caso B: El usuario explícitamente eligió un estado inválido para tener puesto
                     errors.append(f"No se puede asignar un número de puesto a una inscripción con estado '{estado_efectivo}'.")
 
