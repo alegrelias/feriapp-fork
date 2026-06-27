@@ -5,8 +5,10 @@ from django.contrib.auth.forms import UserCreationForm
 from django.urls import reverse_lazy
 from django.utils import timezone
 from django.contrib.auth.mixins import LoginRequiredMixin
-
+from django.db.models import Count, Avg, Sum, Max, Min
+from django.db.models.functions import Round 
 from .models import Feria, Emprendedor,Inscripcion, Categoria,Resenia,Visitante
+from datetime import date
 
 
 class HomeView(TemplateView):
@@ -16,16 +18,23 @@ class HomeView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        hoy = timezone.now().date()
+        hoy = date.today()
+        stat = Resenia.objects.aggregate(avg = Round(Avg("calificacion"),1))
 
-        context["total_ferias_activas"] = Feria.objects.filter(activa=True).count()
+        context["total_ferias_activas"] = Feria.objects.filter(fecha_inicio=hoy).count()
         context["total_emprendedores"] = Emprendedor.objects.count()
-
+        context[hoy] =timezone.now().date()
         #__gte greater than or equal 
         context["ferias_proximas"] = Feria.objects.filter(fecha_inicio__gte=hoy).count()
         context["inscripciones_confirmadas"] = Inscripcion.objects.filter(estado="Confirmada").count()
         context["resenias"] = Resenia.objects.all()[:5]
-        context["ferias_activas"] = Feria.objects.filter(activa=True).order_by("fecha_inicio")[:5]
+        context["total_ferias_realizadas"] = Feria.objects.filter(fecha_inicio__lte=hoy).count()
+
+
+
+        context["promedio_resenias"] = stat.get("avg",[])
+        context["ferias_activas"] = Feria.objects.filter(activa=True).order_by("-fecha_inicio")[:5]
+
         return context
 
 

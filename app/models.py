@@ -1,6 +1,8 @@
 """Modelos de dominio para la aplicación de ferias."""
 
 from __future__ import annotations
+from datetime import date
+
 
 from django.db import models
 from app.base_models import ValidableModel
@@ -82,6 +84,16 @@ class Feria(ValidableModel):#<- ya no heredamos de models.Models sino de Validab
         """Retorna la cantidad de sectores asociados."""
 
         return self.sectores.count()
+    
+    def en_curso(self):
+        hoy = date.today() 
+
+        return  hoy >= self.fecha_inicio and hoy <= self.fecha_fin  
+    
+    def a_comenzar(self):
+        hoy = date.today() 
+
+        return  hoy < self.fecha_inicio
 
     @classmethod
     def validate(cls, **kwargs) -> list[str]:

@@ -71,6 +71,18 @@ body {
 }
 
 /* ========== HOME ========== */
+.realizada{
+    background-color: var(--bs-blue);
+    color: var(--color-hueso);
+}
+.activa{
+    background-color: var(--ft-accent);
+    color: var(--color-hueso);
+}
+.proxima{
+    background-color: var(--ft-action);
+    color: var(--color-hueso);
+}
 
 .hero-main{
     background-color: var(--color-hueso);
