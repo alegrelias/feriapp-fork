@@ -75,6 +75,10 @@ body {
     background-color: var(--bs-blue);
     color: var(--color-hueso);
 }
+.aviso{
+    background-color: var(--accent-warm);
+    color: var(--color-hueso);
+}
 .activa{
     background-color: var(--ft-accent);
     color: var(--color-hueso);

@@ -94,6 +94,11 @@ class Feria(ValidableModel):#<- ya no heredamos de models.Models sino de Validab
         hoy = date.today() 
 
         return  hoy < self.fecha_inicio
+    
+    def finalizada(self):
+        hoy = date.today() 
+
+        return  hoy > self.fecha_fin
 
     @classmethod
     def validate(cls, **kwargs) -> list[str]:

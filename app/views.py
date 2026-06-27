@@ -120,7 +120,7 @@ class FeriasDetailView(LoginRequiredMixin, DetailView):
         #self.object funciona si se hace un get, para post hace una consutla a la bd
         feria = self.get_object()
         comentario = request.POST.get("comentario")
-        calificacion = request.POST.get("calificacion")
+        calificacion = request.POST.get("calificacion") 
         visitante = Visitante.objects.first()  # temporal
         
         #crea y guarda la reseña

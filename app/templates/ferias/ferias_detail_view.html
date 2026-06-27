@@ -53,13 +53,17 @@
 
                 <p><strong>Puestos Libres:</strong> {{ feria.puestos_disponibles }}</p>
                 
-                {% if feria.tiene_lugar %}
+                {% if feria.tiene_lugar and feria.a_comenzar %}
                 <div class="d-flex justify-content-between">
                     <div class="badge badge-detail-feria fs-6 p-2">¡Inscripciones Abiertas!</div>
                     <div><a href="" class="btn btn-detail-feria">Inscribirse </a></div>
                 </div>
-                {% else %}
+                {% elif not feria.tiene_lugar %}
                     <span class="badge bg-danger fs-6">Feria Completa</span>
+                {%elif feria.en_curso%}
+                     <div class="badge aviso fs-6 p-2">Feria en curso, no se permiten inscripciones</div>
+                {%else%}
+                     <div class="badge realizada fs-6 p-2">Feria finalizada, ¡dejá tu comentario!</div>
                 {% endif %}
                 
             </div>
