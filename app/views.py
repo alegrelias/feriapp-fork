@@ -37,9 +37,15 @@ class PerfilView(LoginRequiredMixin,TemplateView):
         emprendedor = Emprendedor.objects.filter(usuario=self.request.user).first()
         visitante = Visitante.objects.filter(usuario=self.request.user).first()
         
+
         if emprendedor:
+            #inscripciones_emprendedor es el related name que se le inyecta como atributo a emprendedor
+            #SELECT * FROM mi_app_inscripcion WHERE emprendedor_id = [ID del emprendedor actual];
+            #  con select related hace el join con Feria para evitar viajar 2 veces a la bd
+            context["inscripciones"] = emprendedor.inscripciones_emprendedor.select_related('feria')
             context["perfil"] = emprendedor
             context["tipo"] = "emprendedor"
+           
         elif visitante:
             context["perfil"] = visitante
             context["tipo"] = "visitante"

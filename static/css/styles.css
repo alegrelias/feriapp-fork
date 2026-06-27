@@ -5,6 +5,7 @@
     --color-hueso: #fffffa;
 
     --ft-primary: #5B4FCF;
+    --ft-primary-transparent: #ada3fb;
     --ft-transparent: #d5d0fd;
     --ft-action:  #7C6FE0;
     --ft-bg:      #F7F7FB;
@@ -134,4 +135,12 @@ body {
 .stat-label {
     font-size: 17px;
     color: var(--ft-muted);
+}
+
+/* ========== PERFIL ========== */
+.card-profile-logo{
+    border-radius: 40px;
+    background-color:var(--ft-primary-transparent);
+    color: var(--ft-text);
+    font-weight: 500;
 }
