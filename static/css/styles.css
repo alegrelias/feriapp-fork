@@ -3,13 +3,15 @@
     --bs-primary-rgb: 26, 58, 92;
     --hover-primary: #2d4d72;
     --color-hueso: #fffffa;
-
+    --accent-warm: #FFB347;
     --ft-primary: #5B4FCF;
     --ft-primary-transparent: #ada3fb;
+    --ft-primary-transparent2: #dddaf9;
     --ft-transparent: #d5d0fd;
     --ft-action:  #7C6FE0;
     --ft-bg:      #F7F7FB;
-    --ft-accent:  #06B6A2;
+    --ft-accent:  #12b29f;
+    --ft-accent2:#c6fff8;
     --ft-accent-transparent:#ebe8e5;
     --ft-text:    #1A1A2E;
     --ft-muted:   #7B7B9A;
@@ -143,4 +145,45 @@ body {
     background-color:var(--ft-primary-transparent);
     color: var(--ft-text);
     font-weight: 500;
+}
+
+/* ========== FERIA DETAIL ========== */
+
+.card-detail-feria{
+
+}
+
+.progress-bar-feria {
+    background: linear-gradient(90deg, var(--ft-primary), var(--ft-action));
+}
+
+.badge-detail-feria{
+    background-color: var(--ft-accent2);
+    color: var(--ft-accent);
+    border-radius: 20px;
+}
+.btn-detail-feria{
+    background-color: var(--ft-accent);
+    color: var(--ft-bg);
+}
+
+.btn-detail-feria:hover{
+    
+    background-color: var(--ft-accent2);
+    border-color: var(--ft-accent2);
+    color: var(--ft-text);
+}
+
+.detail-header{
+    background-color: var(--ft-text);
+    font-size: 10px;
+    color: var(--ft-border);
+}
+
+.resenia-detail-feria{
+    background-color: white;
+}
+
+.resenia-detail-feria-header{
+    background-color: var(--ft-primary-transparent2);
 }

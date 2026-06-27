@@ -100,6 +100,9 @@ class FeriasDetailView(LoginRequiredMixin, DetailView):
 
         context["ocupacion"] = (self.object.puestos_ocupados() * 100) / self.object.capacidad_puestos
 
+        #self.object es la pk de la url
+        context["resenias"] = Resenia.objects.filter(feria=self.object)
+
         return context
 
 # ========== Vistas para Emprendedores ==========

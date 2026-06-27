@@ -4,15 +4,15 @@
 
 {% block content %}
 <div class="row justify-content-center">
-    <div class="col-md-8">
+    <div class="col-12 col-md-8">
         
-        <div class="card shadow-sm mt-4">
-            <div class="card-header bg-success text-white">
+        <div class="card card-detail-feria shadow-sm mt-4 ">
+            <div class="card-header detail-header  p-3">
                 <h2 class="h4 mb-0">{{ feria.nombre }}</h2>
             </div>
             
-            <div class="card-body">
-                <h5 class="text-muted mb-4">Categoría: {{ feria.categoria }}</h5>
+            <div class="card-body p-4">
+                <h5 class=" mb-4" style="font-size:15px; color: var(--ft-muted);" >Categoría: {{ feria.categoria }}</h5>
                 
                 <p><strong>📍 Ubicación:</strong> {{ feria.ubicacion }}</p>
                 <p><strong>📅 Fechas:</strong> Del {{ feria.fecha_inicio }} al {{ feria.fecha_fin }}</p>
@@ -22,9 +22,9 @@
                 <p><strong>Capacidad Total:</strong> {{ feria.capacidad_puestos }} puestos</p>
                 <p class="mb-2"><strong>Puestos ocupados:</strong> {{ feria.puestos_ocupados }}</p>
 
-                <div class="progress mb-3" style="height: 20px;">
+                <div class="progress mb-3" style="height: 20px; background-color: var(--ft-primary-transparent2);">
                     <div 
-                        class="progress-bar bg-success" 
+                        class="progress-bar progress-bar-feria" 
                         role="progressbar" 
                         style="--progress-width: {{ ocupacion }}%; width: var(--progress-width);"
                         aria-valuenow="{{ ocupacion }}" 
@@ -37,7 +37,7 @@
 
                 <h5 class="mt-4 mb-3">Emprendedores participantes</h5>
 
-                <ul class="list-group">
+                <ul class="list-group mb-3">
                     {% for inscripcion in inscripciones %}
                         <li class="list-group-item d-flex align-items-center">
                             <span class="fw-semibold">
@@ -54,18 +54,48 @@
                 <p><strong>Puestos Libres:</strong> {{ feria.puestos_disponibles }}</p>
                 
                 {% if feria.tiene_lugar %}
-                    <span class="badge bg-success fs-6">¡Inscripciones Abiertas!</span>
+                <div class="d-flex justify-content-between">
+                    <div class="badge badge-detail-feria fs-6 p-2">¡Inscripciones Abiertas!</div>
+                    <div><a href="" class="btn btn-detail-feria">Inscribirse </a></div>
+                </div>
                 {% else %}
                     <span class="badge bg-danger fs-6">Feria Completa</span>
                 {% endif %}
                 
             </div>
-            
-            <div class="card-footer bg-light text-end">
+             <div class="card-footer bg-light text-end">
                 <a href="{% url 'ferias:lista_ferias' %}" class="btn btn-secondary">Volver al listado</a>
             </div>
         </div>
-
     </div>
+             <div class="col-12 col-md-4 mt-4">
+                <div class="card resenia-detail-feria">
+                <div class="card-header resenia-detail-feria-header ">
+                Reseñas recientes
+                </div>
+                <div class="card-body p-0">
+                    {% for resenia in resenias %}
+                        <div class="d-flex align-items-start gap-2 p-3 border-bottom">
+                            <div class="d-flex flex-column flex-grow-1">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span class="fw-500" style="font-size:13px; color: var(--ft-text);">{{ resenia.visitante.nombre }} {{ resenia.visitante.apellido }}</span>
+                                    <span style="color: var(--ft-accent); font-size:12px;">
+                                        {% for i in "12345" %}
+                                            {% if forloop.counter <= resenia.calificacion %}★{% else %}☆{% endif %}
+                                        {% endfor %}
+                                    </span>
+                                </div>
+                            
+                                <p class="mb-0 mt-1" style="font-size:12px; color: var(--ft-muted);">{{ resenia.comentario }}</p>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+                </div>
+             </div>
+           
+      
+
+   
 </div>
 {% endblock %}
