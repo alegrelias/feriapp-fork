@@ -4,6 +4,7 @@
     --hover-primary: #2d4d72;
     --color-hueso: #fffffa;
     --accent-warm: #FFB347;
+      --accent-warm2: #ffba58;
     --ft-primary: #5B4FCF;
     --ft-primary-transparent: #ada3fb;
     --ft-primary-transparent2: #dddaf9;
@@ -76,7 +77,7 @@ body {
     color: var(--color-hueso);
 }
 .aviso{
-    background-color: var(--accent-warm);
+    background-color: var(--accent-warm2);
     color: var(--color-hueso);
 }
 .activa{
