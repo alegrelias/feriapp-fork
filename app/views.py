@@ -10,7 +10,8 @@ from django.db.models.functions import Round
 from .models import Feria, Emprendedor,Inscripcion, Categoria,Resenia,Visitante
 from datetime import date
 from django.shortcuts import redirect
-
+from django.http import HttpResponseRedirect
+from .forms import FeriaForm
 
 
 class HomeView(TemplateView):
@@ -153,28 +154,26 @@ class EmprendedoresListView(LoginRequiredMixin, ListView):
 
 class NuevaFeriaView(LoginRequiredMixin, CreateView):
 
-    model = Feria
-
-    fields = ["nombre","categoria","fecha_inicio","fecha_fin","ubicacion","capacidad_puestos","activa",]
-
     template_name = "ferias/nueva_feria.html"
+    form_class = FeriaForm
 
-    success_url = reverse_lazy("ferias:lista_ferias")
+    def form_valid(self, form):
 
-    def get_form(self, form_class=None):
-        form = super().get_form(form_class)
-        
-        form.fields['categoria'].empty_label = "Seleccione una categoría"
-        
-        for field_name, field in form.fields.items():
-            if field_name == 'categoria':
-                field.widget.attrs.update({'class': 'form-select'})
-            elif field_name == 'activa':
-                field.widget.attrs.update({'class': 'form-check-input'})
-            else:
-                field.widget.attrs.update({'class': 'form-control'})
-                
-        return form
+        feria, errores = Feria.new(
+            **form.cleaned_data
+        )
+
+        if errores:
+            for error in errores:
+                form.add_error(None, error)
+
+            return self.form_invalid(form)
+
+        self.object = feria
+
+        return HttpResponseRedirect(
+            reverse_lazy("ferias:lista_ferias")
+        )
 
 # class NuevaInscripcionView(CreateView): ...
 # class CancelarInscripcionView(View): ...
