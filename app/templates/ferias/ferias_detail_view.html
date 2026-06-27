@@ -5,30 +5,30 @@
 {% block content %}
 <div class="row justify-content-center">
     <div class="col-12 col-md-8">
-        
+
         <div class="card card-detail-feria shadow-sm mt-4 ">
             <div class="card-header detail-header  p-3">
                 <h2 class="h4 mb-0">{{ feria.nombre }}</h2>
             </div>
-            
+
             <div class="card-body p-4">
                 <h5 class=" mb-4" style="font-size:15px; color: var(--ft-muted);" >Categoría: {{ feria.categoria }}</h5>
-                
+
                 <p><strong>📍 Ubicación:</strong> {{ feria.ubicacion }}</p>
                 <p><strong>📅 Fechas:</strong> Del {{ feria.fecha_inicio }} al {{ feria.fecha_fin }}</p>
                 <hr>
-                
+
                 <h5 class="mt-3">Disponibilidad</h5>
                 <p><strong>Capacidad Total:</strong> {{ feria.capacidad_puestos }} puestos</p>
                 <p class="mb-2"><strong>Puestos ocupados:</strong> {{ feria.puestos_ocupados }}</p>
 
                 <div class="progress mb-3" style="height: 20px; background-color: var(--ft-primary-transparent2);">
-                    <div 
-                        class="progress-bar progress-bar-feria" 
-                        role="progressbar" 
+                    <div
+                        class="progress-bar progress-bar-feria"
+                        role="progressbar"
                         style="--progress-width: {{ ocupacion }}%; width: var(--progress-width);"
-                        aria-valuenow="{{ ocupacion }}" 
-                        aria-valuemin="0" 
+                        aria-valuenow="{{ ocupacion }}"
+                        aria-valuemin="0"
                         aria-valuemax="100"
                     >
                         <span class="fw-bold">{{ ocupacion|floatformat:0 }}%</span>
@@ -52,11 +52,11 @@
                 </ul>
 
                 <p><strong>Puestos Libres:</strong> {{ feria.puestos_disponibles }}</p>
-                
+
                 {% if feria.tiene_lugar and feria.a_comenzar %}
                 <div class="d-flex justify-content-between">
                     <div class="badge badge-detail-feria fs-6 p-2">¡Inscripciones Abiertas!</div>
-                    <div><a href="" class="btn btn-detail-feria">Inscribirse </a></div>
+                    <div><a href="{% url 'ferias:nueva_inscripcion' pk=feria.pk %}" class="btn btn-detail-feria">Inscribirse </a></div>
                 </div>
                 {% elif not feria.tiene_lugar %}
                     <span class="badge bg-danger fs-6">Feria Completa</span>
@@ -65,7 +65,7 @@
                 {%else%}
                      <div class="badge realizada fs-6 p-2">Feria finalizada, ¡dejá tu comentario!</div>
                 {% endif %}
-                
+
             </div>
              <div class="card-footer bg-light text-end">
                 <a href="{% url 'ferias:lista_ferias' %}" class="btn btn-secondary">Volver al listado</a>
@@ -89,16 +89,16 @@
                                         {% endfor %}
                                     </span>
                                 </div>
-                            
+
                                 <p class="mb-0 mt-1" style="font-size:12px; color: var(--ft-muted);">{{ resenia.comentario }}</p>
                             </div>
                         </div>
                     {% endfor %}
                 </div>
                 </div>
-             
-           
-            
+
+
+
                 <div class="card resenia-detail-feria">
                 <div class="card-header resenia-detail-feria-header ">
                 Dejar un comentario
@@ -120,7 +120,7 @@
                         <div class="mb-3">
                             <textarea class="form-control" name ="comentario" rows="3" placeholder="Escribe tu comentario aquí..." required></textarea>
                         </div>
-                        
+
                         <div class="d-flex justify-content-end">
                             <button type="submit" class="btn btn-detail-feria btn-sm px-4">Publicar comentario</button>
                         </div>
@@ -129,6 +129,6 @@
                 </div>
             </div>
 
-   
+
 </div>
 {% endblock %}
