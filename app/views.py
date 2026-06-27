@@ -9,6 +9,8 @@ from django.db.models import Count, Avg, Sum, Max, Min
 from django.db.models.functions import Round 
 from .models import Feria, Emprendedor,Inscripcion, Categoria,Resenia,Visitante
 from datetime import date
+from django.shortcuts import redirect
+
 
 
 class HomeView(TemplateView):
@@ -113,6 +115,27 @@ class FeriasDetailView(LoginRequiredMixin, DetailView):
         context["resenias"] = Resenia.objects.filter(feria=self.object)
 
         return context
+    
+    def post(self, request, *args, **kwargs):
+        #self.object funciona si se hace un get, para post hace una consutla a la bd
+        feria = self.get_object()
+        comentario = request.POST.get("comentario")
+        calificacion = request.POST.get("calificacion")
+        visitante = Visitante.objects.first()  # temporal
+        
+        #crea y guarda la reseña
+        Resenia.objects.create(
+            visitante=visitante,
+            feria=feria,
+            calificacion=calificacion,
+            comentario=comentario
+        )
+
+        #redirige al detalle de la feria
+        
+        return redirect("ferias:detalle_feria", pk=feria.pk)
+
+
 
 # ========== Vistas para Emprendedores ==========
 
