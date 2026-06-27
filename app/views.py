@@ -10,7 +10,8 @@ from django.db.models.functions import Round
 from .models import Feria, Emprendedor,Inscripcion,Categoria,Resenia,Visitante
 from datetime import date
 from django.shortcuts import redirect
-from .form import InscripcionForm
+from django.http import HttpResponseRedirect
+from .forms import FeriaFormfrom .form import InscripcionForm
 
 
 
@@ -154,13 +155,8 @@ class EmprendedoresListView(LoginRequiredMixin, ListView):
 
 class NuevaFeriaView(LoginRequiredMixin, CreateView):
 
-    model = Feria
-
-    fields = ["nombre","categoria","fecha_inicio","fecha_fin","ubicacion","capacidad_puestos","activa",]
-
     template_name = "ferias/nueva_feria.html"
-
-    success_url = reverse_lazy("ferias:lista_ferias")
+    form_class = FeriaForm
 
     def get_form(self, form_class=None):
         form = super().get_form(form_class)
