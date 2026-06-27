@@ -6,10 +6,12 @@ from django.urls import reverse_lazy
 from django.utils import timezone
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Count, Avg, Sum, Max, Min
-from django.db.models.functions import Round 
-from .models import Feria, Emprendedor,Inscripcion, Categoria,Resenia,Visitante
+from django.db.models.functions import Round
+from .models import Feria, Emprendedor,Inscripcion,Categoria,Resenia,Visitante
 from datetime import date
 from django.shortcuts import redirect
+from django.http import HttpResponseRedirect
+from .forms import FeriaFormfrom .form import InscripcionForm
 
 
 
@@ -26,7 +28,7 @@ class HomeView(TemplateView):
         context["total_ferias_activas"] = Feria.objects.filter(fecha_inicio=hoy).count()
         context["total_emprendedores"] = Emprendedor.objects.count()
         context[hoy] =timezone.now().date()
-        #__gte greater than or equal 
+        #__gte greater than or equal
         context["ferias_proximas"] = Feria.objects.filter(fecha_inicio__gte=hoy).count()
         context["inscripciones_confirmadas"] = Inscripcion.objects.filter(estado="Confirmada").count()
         context["resenias"] = Resenia.objects.all()[:5]
@@ -47,7 +49,7 @@ class PerfilView(LoginRequiredMixin,TemplateView):
         context = super().get_context_data(**kwargs)
         emprendedor = Emprendedor.objects.filter(usuario=self.request.user).first()
         visitante = Visitante.objects.filter(usuario=self.request.user).first()
-        
+
 
         if emprendedor:
             #inscripciones_emprendedor es el related name que se le inyecta como atributo a emprendedor
@@ -56,11 +58,11 @@ class PerfilView(LoginRequiredMixin,TemplateView):
             context["inscripciones"] = emprendedor.inscripciones_emprendedor.select_related('feria')
             context["perfil"] = emprendedor
             context["tipo"] = "emprendedor"
-           
+
         elif visitante:
             context["perfil"] = visitante
             context["tipo"] = "visitante"
-        
+
         return context
 
 
@@ -115,14 +117,14 @@ class FeriasDetailView(LoginRequiredMixin, DetailView):
         context["resenias"] = Resenia.objects.filter(feria=self.object)
 
         return context
-    
+
     def post(self, request, *args, **kwargs):
         #self.object funciona si se hace un get, para post hace una consutla a la bd
         feria = self.get_object()
         comentario = request.POST.get("comentario")
-        calificacion = request.POST.get("calificacion") 
+        calificacion = request.POST.get("calificacion")
         visitante = Visitante.objects.first()  # temporal
-        
+
         #crea y guarda la reseña
         Resenia.objects.create(
             visitante=visitante,
@@ -132,7 +134,7 @@ class FeriasDetailView(LoginRequiredMixin, DetailView):
         )
 
         #redirige al detalle de la feria
-        
+
         return redirect("ferias:detalle_feria", pk=feria.pk)
 
 
@@ -153,19 +155,14 @@ class EmprendedoresListView(LoginRequiredMixin, ListView):
 
 class NuevaFeriaView(LoginRequiredMixin, CreateView):
 
-    model = Feria
-
-    fields = ["nombre","categoria","fecha_inicio","fecha_fin","ubicacion","capacidad_puestos","activa",]
-
     template_name = "ferias/nueva_feria.html"
-
-    success_url = reverse_lazy("ferias:lista_ferias")
+    form_class = FeriaForm
 
     def get_form(self, form_class=None):
         form = super().get_form(form_class)
-        
+
         form.fields['categoria'].empty_label = "Seleccione una categoría"
-        
+
         for field_name, field in form.fields.items():
             if field_name == 'categoria':
                 field.widget.attrs.update({'class': 'form-select'})
@@ -173,7 +170,7 @@ class NuevaFeriaView(LoginRequiredMixin, CreateView):
                 field.widget.attrs.update({'class': 'form-check-input'})
             else:
                 field.widget.attrs.update({'class': 'form-control'})
-                
+
         return form
 
 # class NuevaInscripcionView(CreateView): ...
@@ -183,3 +180,37 @@ class RegistroUsuarioView(CreateView):
     template_name = 'ferias/registration/registro.html'
     form_class = UserCreationForm
     success_url = reverse_lazy('ferias:login')
+
+class NuevaInscripcionView(LoginRequiredMixin, CreateView):
+    model = Inscripcion
+    form_class = InscripcionForm
+    template_name = 'ferias/nueva_inscripcion.html'
+
+    def form_valid(self, form):
+        inscripcion = form.save(commit=False)  # crea el objeto pero NO lo guarda todavía
+        inscripcion.feria = Feria.objects.get(pk=self.kwargs["pk"])  # completás los campos que faltan
+        inscripcion.emprendedor = Emprendedor.objects.first()
+        inscripcion.registrado_por = inscripcion.emprendedor
+        errors = Inscripcion.validate(emprendedor=inscripcion.emprendedor, feria=inscripcion.feria,
+        numero_puesto=inscripcion.numero_puesto, registrado_por=inscripcion.registrado_por, estado=inscripcion.estado)
+        if errors:
+            form.add_error(None, errors)
+            return self.form_invalid(form)
+        inscripcion.save()                     # ahora sí lo guardás
+        return redirect("ferias:lista_ferias")  # redirigís a la lista de ferias
+
+
+class CancelarInscripcionView(LoginRequiredMixin, CreateView):
+    model = Inscripcion
+    template_name = 'ferias/cancelar_inscripcion.html'
+    success_url = reverse_lazy('ferias:perfil')
+
+    def post(self, request, *args, **kwargs):
+        inscripcion = self.get_object()
+        inscripcion.estado = "Cancelada"
+        inscripcion.save()
+        return redirect(self.success_url)
+
+    def get_object(self, queryset=None):
+        inscripcion_id = self.kwargs.get('pk')
+        return Inscripcion.objects.get(pk=inscripcion_id)
