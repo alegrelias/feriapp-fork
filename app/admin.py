@@ -3,7 +3,11 @@
 from django.contrib import admin
 from .models import Feria, Categoria, Emprendedor, Inscripcion, Visitante, Resenia, Sector
 
-# TODO: reemplazar por @admin.register con list_display, list_filter, search_fields
+
+class SectorInline(admin.TabularInline):
+    model = Sector
+    extra = 1
+
 @admin.register(Feria)
 class FeriaAdmin(admin.ModelAdmin):
     list_display = ('nombre', 'categoria', 'fecha_inicio', 'fecha_fin', 'activa')
@@ -21,6 +25,8 @@ class FeriaAdmin(admin.ModelAdmin):
         })
     )
 
+    inlines = [SectorInline]
+
 @admin.register(Categoria)
 class CategoriaAdmin(admin.ModelAdmin):
     list_display = ('nombre', 'descripcion')
@@ -34,6 +40,12 @@ class CategoriaAdmin(admin.ModelAdmin):
             'fields': ('nombre', 'descripcion')
         }),
     )
+
+class InscripcionInline(admin.TabularInline):
+    model = Inscripcion
+    extra = 0
+    can_delete = False
+    readonly_fields = ('feria', 'numero_puesto', 'fecha_inscripcion', 'estado', 'registrado_por')
 
 @admin.register(Emprendedor)
 class EmprendedorAdmin(admin.ModelAdmin):
@@ -51,6 +63,8 @@ class EmprendedorAdmin(admin.ModelAdmin):
             'fields': ('rubro',)
         })
     )
+
+    inlines = [InscripcionInline]
 
 
 #En Django, los campos automáticos no se muestran en los formularios de edición por defecto
