@@ -292,7 +292,7 @@ class Emprendedor(ValidableModel):
     email = models.EmailField(max_length=254, unique=True)
     rubro = models.ForeignKey(Categoria, on_delete=models.SET_NULL, null=True)
     telefono = models.CharField(max_length=20, blank=True, null=True)
-    usuario = models.ForeignKey(User, on_delete=models.CASCADE)
+    usuario = models.OneToOneField(User, on_delete=models.CASCADE, related_name='emprendedor')
     objects = EmprendedorManager()
 
     def __str__(self):
@@ -338,7 +338,7 @@ class Visitante(ValidableModel):
     nombre = models.CharField(max_length=200)
     apellido = models.CharField(max_length=200)
     email = models.EmailField(max_length=254, unique=True)
-    usuario = models.ForeignKey(User, on_delete=models.CASCADE)
+    usuario = models.OneToOneField(User, on_delete=models.CASCADE, related_name="visitante")
     fecha_registro = models.DateField()
 
     def __str__(self):

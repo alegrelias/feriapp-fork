@@ -1,7 +1,9 @@
 from django import forms
-from .models import Feria
+from .models import Feria,Categoria
 from django.utils import timezone
 from .models import Inscripcion
+from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.models import User
 
 class FeriaForm(forms.ModelForm):
 
@@ -32,3 +34,70 @@ class InscripcionForm(forms.ModelForm):
     class Meta:
         model = Inscripcion
         fields = ["numero_puesto"]  # acá van los campos
+
+
+
+class RegistroEmprendedorForm(UserCreationForm):
+    #forms.CharField → crea un <input type="text"> en el HTML y valida que no supere el max_length
+    nombre = forms.CharField(
+        max_length=200,
+        widget=forms.TextInput(attrs={"class": "form-control"})
+    )
+    apellido = forms.CharField(
+        max_length=200,
+        widget=forms.TextInput(attrs={"class": "form-control"})
+    )
+    email = forms.EmailField(
+        widget=forms.EmailInput(attrs={"class": "form-control"})
+    )
+    telefono = forms.CharField(
+        max_length=20,
+        required=False,
+        widget=forms.TextInput(attrs={"class": "form-control"})
+    )
+    #ModelChoiceField se usa cuando el campo es una ForeignKey, en este caso rubro que apunta a Categoria. Genera un <select> con todas las categorías disponibles.
+    rubro = forms.ModelChoiceField(
+        queryset=Categoria.objects.all(),
+        widget=forms.Select(attrs={"class": "form-select"})
+    )
+    password1 = forms.CharField(
+    widget=forms.PasswordInput(attrs={"class": "form-control"})
+    )
+    password2 = forms.CharField(
+        widget=forms.PasswordInput(attrs={"class": "form-control"})
+    )
+
+    class Meta:
+        model = User
+        fields = ["username", "password1", "password2"]
+        widgets = {
+            "username": forms.TextInput(attrs={"class": "form-control"}),
+        }
+
+
+class RegistroVisitanteForm(UserCreationForm):
+    nombre = forms.CharField(
+        max_length=200,
+        widget=forms.TextInput(attrs={"class": "form-control"})
+    )
+    apellido = forms.CharField(
+        max_length=200,
+        widget=forms.TextInput(attrs={"class": "form-control"})
+    )
+    email = forms.EmailField(
+        widget=forms.EmailInput(attrs={"class": "form-control"})
+    )
+    password1 = forms.CharField(
+    widget=forms.PasswordInput(attrs={"class": "form-control"})
+    )
+    password2 = forms.CharField(
+        widget=forms.PasswordInput(attrs={"class": "form-control"})
+    )
+
+    class Meta:
+        model = User
+        fields = ["username", "password1", "password2"]
+        widgets = {
+            "username": forms.TextInput(attrs={"class": "form-control"}),
+        }
+    

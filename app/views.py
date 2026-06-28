@@ -11,9 +11,10 @@ from .models import Feria, Emprendedor,Inscripcion,Categoria,Resenia,Visitante
 from datetime import date
 from django.shortcuts import redirect
 from django.http import HttpResponseRedirect
-from .forms import FeriaForm
+from .forms import FeriaForm, RegistroEmprendedorForm,RegistroVisitanteForm
 from .forms import InscripcionForm
 from django.contrib import messages
+from django.db import transaction
 
 
 
@@ -177,11 +178,44 @@ class NuevaFeriaView(LoginRequiredMixin, CreateView):
 
 # class NuevaInscripcionView(CreateView): ...
 # class CancelarInscripcionView(View): ...
-
-class RegistroUsuarioView(CreateView):
+class RegistroView(TemplateView):
     template_name = 'ferias/registration/registro.html'
-    form_class = UserCreationForm
+class RegistroEmprendedorView(CreateView):
+    template_name = 'ferias/registration/registro_emprendedor.html'
+    form_class = RegistroEmprendedorForm
     success_url = reverse_lazy('ferias:login')
+
+    def form_valid(self, form):
+        with transaction.atomic():
+            user = form.save()  # crea el User
+            Emprendedor.objects.create(
+                usuario=user,
+                nombre=form.cleaned_data["nombre"],
+                apellido=form.cleaned_data["apellido"],
+                email=form.cleaned_data["email"],
+                telefono=form.cleaned_data["telefono"],
+                rubro=form.cleaned_data["rubro"]
+            )
+        return redirect(self.success_url)
+
+class RegistroVisitanteView(CreateView):
+    template_name = 'ferias/registration/registro_visitante.html'
+    form_class = RegistroVisitanteForm
+    success_url = reverse_lazy('ferias:login')
+
+    def form_valid(self, form):
+        with transaction.atomic():
+            user = form.save()
+            Visitante.objects.create(
+                usuario=user,
+                nombre=form.cleaned_data["nombre"],
+                apellido=form.cleaned_data["apellido"],
+                email=form.cleaned_data["email"],
+                fecha_registro=date.today()
+            )
+        return redirect(self.success_url)
+
+
 
 class NuevaInscripcionView(LoginRequiredMixin, CreateView):
     model = Inscripcion
@@ -190,7 +224,7 @@ class NuevaInscripcionView(LoginRequiredMixin, CreateView):
 
     def form_valid(self, form):
         inscripcion = form.save(commit=False)  # crea el objeto pero NO lo guarda todavía
-        inscripcion.feria = Feria.objects.get(pk=self.kwargs["pk"])  # completás los campos que faltan
+        inscripcion.feria = Feria.objects.get(pk=self.kwargs["pk"])  
         inscripcion.emprendedor = Emprendedor.objects.first()
         inscripcion.registrado_por = inscripcion.emprendedor
         errors = Inscripcion.validate(emprendedor=inscripcion.emprendedor, feria=inscripcion.feria,
@@ -198,7 +232,7 @@ class NuevaInscripcionView(LoginRequiredMixin, CreateView):
         if errors:
             form.add_error(None, errors)
             return self.form_invalid(form)
-        inscripcion.save()                     # ahora sí lo guardás
+        inscripcion.save()                     # ahora sí se guarda
         messages.success(self.request, "Tu inscripción se encuentra en lista de espera. Cuando sea confirmada, recibirás un correo electrónico con la información correspondiente.")
 
         return redirect("ferias:lista_ferias")  # redirigís a la lista de ferias
