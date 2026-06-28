@@ -4,7 +4,7 @@ from django.views.generic import ListView, TemplateView, DetailView, CreateView
 from django.contrib.auth.forms import UserCreationForm
 from django.urls import reverse_lazy
 from django.utils import timezone
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.db.models import Count, Avg, Sum, Max, Min
 from django.db.models.functions import Round
 from .models import Feria, Emprendedor,Inscripcion,Categoria,Resenia,Visitante
@@ -39,19 +39,29 @@ class HomeView(TemplateView):
 
 
 
-        context["promedio_resenias"] = stat.get("avg",[])
+        context["promedio_resenias"] = stat.get("avg") or 0
         context["ferias_activas"] = Feria.objects.filter(activa=True).order_by("-fecha_inicio")[:5]
 
         return context
 
 
 class PerfilView(LoginRequiredMixin,TemplateView):
-    template_name = "perfil.html"
+    template_name = "ferias/perfil.html"
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        emprendedor = Emprendedor.objects.filter(usuario=self.request.user).first()
-        visitante = Visitante.objects.filter(usuario=self.request.user).first()
+        emprendedor = None
+        visitante = None
+        try:
+            emprendedor = self.request.user.emprendedor  #  acceder al emprendedor
+        except:
+             # si no tiene emprendedor, Django lanza un error
+            # en vez de explotar, intentamos con visitante
+            try:
+                visitante = self.request.user.visitante
+            except:
+             # si tampoco tiene visitante (ej: admin)
+                perfil = self.request.user
 
 
         if emprendedor:
@@ -60,11 +70,14 @@ class PerfilView(LoginRequiredMixin,TemplateView):
             #  con select related hace el join con Feria para evitar viajar 2 veces a la bd
             context["inscripciones"] = emprendedor.inscripciones_emprendedor.select_related('feria')
             context["perfil"] = emprendedor
-            context["tipo"] = "emprendedor"
+            context["tipo"] = "Emprendedor"
 
         elif visitante:
+            context["resenias"] = visitante.resenias.select_related('feria')
             context["perfil"] = visitante
-            context["tipo"] = "visitante"
+            context["tipo"] = "Visitante"
+        else:
+             context["perfil"] = perfil
 
         return context
 
@@ -106,6 +119,17 @@ class FeriasDetailView(LoginRequiredMixin, DetailView):
     def get_context_data(self, **kwargs):
 
         context = super().get_context_data(**kwargs)
+        emprendedor = None
+        visitante = None
+        try:
+            emprendedor = self.request.user.emprendedor  #  acceder al emprendedor
+        except:
+            
+            try:
+                visitante = self.request.user.visitante
+            except:
+            
+                perfil = self.request.user
 
         inscripciones = Inscripcion.objects.filter(
             feria=self.object,
@@ -113,6 +137,8 @@ class FeriasDetailView(LoginRequiredMixin, DetailView):
         )
 
         context["inscripciones"] = inscripciones
+        context["emprendedor"] = emprendedor
+        context["visitante"] = visitante
 
         context["ocupacion"] = (self.object.puestos_ocupados() * 100) / self.object.capacidad_puestos
 
@@ -126,7 +152,15 @@ class FeriasDetailView(LoginRequiredMixin, DetailView):
         feria = self.get_object()
         comentario = request.POST.get("comentario")
         calificacion = request.POST.get("calificacion")
-        visitante = Visitante.objects.first()  # temporal
+        visitante = None
+          
+        try:
+            visitante = self.request.user.visitante
+        except:
+                 
+            messages.warning(self.request, "Solo los visitantes pueden dejar reseñas")
+            return redirect("ferias:detalle_feria", pk=feria.pk)
+
 
         #crea y guarda la reseña
         Resenia.objects.create(
@@ -196,13 +230,16 @@ class RegistroEmprendedorView(CreateView):
                 telefono=form.cleaned_data["telefono"],
                 rubro=form.cleaned_data["rubro"]
             )
-        messages.success(self.request, "Registro como Emprendedor exitoso, inicia sesión")
+        messages.success(self.request, "Registro como Emprendedor exitoso")
         return redirect(self.success_url)
 
 class RegistroVisitanteView(CreateView):
     template_name = 'ferias/registration/registro_visitante.html'
     form_class = RegistroVisitanteForm
     success_url = reverse_lazy('ferias:login')
+
+   
+        
 
     def form_valid(self, form):
         with transaction.atomic():
@@ -219,10 +256,24 @@ class RegistroVisitanteView(CreateView):
 
 
 
-class NuevaInscripcionView(LoginRequiredMixin, CreateView):
+class NuevaInscripcionView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
     model = Inscripcion
     form_class = InscripcionForm
     template_name = 'ferias/nueva_inscripcion.html'
+
+    def test_func(self):
+       
+        # si el usuario tiene atributo emprendedor, Si da False, el motor de Django hace: 'self.handle_no_permission()'
+        return hasattr(self.request.user, 'emprendedor')
+
+    def handle_no_permission(self):
+        """
+         se ejeecuta solo si test_func() devuelve False
+      
+        """
+        messages.warning(self.request, "Acceso denegado: Debes registrar un perfil de Emprendedor para inscribirte.")
+        
+        return redirect("ferias:lista_ferias")
 
     def form_valid(self, form):
         inscripcion = form.save(commit=False)  # crea el objeto pero NO lo guarda todavía

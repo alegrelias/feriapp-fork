@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+
+{% block title %}Perfil — FeriApp{% endblock %}
+
+{% block content %}
+ <div class="row mb-4 mt-4  justify-content-center">
+        <div class="col-9 ">
+          <div class="card">
+    
+            <div class="card-header">Mis Datos</div>
+            <div class="card-body p-0">
+              <div class="d-flex justify-content-start align-items-center p-3 border-bottom ">
+                <div class="p-4 m-1 card-profile-logo"">{{ perfil.nombre|slice:":1"|upper  }}{{ perfil.apellido|slice:":1"|upper  }}</div>
+                <div>
+                <p class="m-2 mb-0" style="font-weight:500;">{{perfil.usuario}} </p>
+                <p class="m-2 mb-0" style=" color:var(--ft-muted);">{{perfil.email}}</p>
+                   <p class="m-2 mb-0 badge-detail-feria p-1" style="font-size:11px; color:var(--ft-text);text-align: center;">{{tipo}}</p>
+              </div> 
+              </div>
+            </div>
+
+             <div class="card-body p-0">
+              <div class="d-flex justify-content-start align-items-start p-3 border-bottom  ">
+                <div class="m-3 ">
+                  <p class="m-2 mb-0" style="font-size:11px; color:var(--ft-muted);">Nombre</p>
+                   <p class="m-2 mb-0" style="font-size:13px; font-weight:500;">{{perfil.nombre}}</p>
+                    <p class="m-2 mb-0" style="font-size:11px; color:var(--ft-muted);">Email</p>
+                   <p class="m-2 mb-0" style="font-size:13px; font-weight:500;">{{perfil.email}}</p>
+                   {%if tipo == "Emprendedor"%}
+                    <p class="m-2 mb-0" style="font-size:11px; color:var(--ft-muted);">Rubro</p>
+                   <p class="m-2 mb-0" style="font-size:13px; font-weight:500;">{{perfil.rubro}}</p>
+                   {%endif%}
+                </div>
+                <div class="m-3">
+                 <p class="m-2 mb-0" style="font-size:11px; color:var(--ft-muted);">Apellido </p>
+                   <p class="m-2 mb-0" style="font-size:13px; font-weight:500;">{{perfil.apellido}}</p>
+                    {%if tipo == "Emprendedor"%}
+                    <p class="m-2 mb-0" style="font-size:11px; color:var(--ft-muted);">Telefono </p>
+                   <p class="m-2 mb-0" style="font-size:13px; font-weight:500;">{{perfil.telefono}}</p>
+                     {%endif%}
+              </div> 
+              </div>
+            </div>
+          </div>
+        </div>
+
+   <div class="row mb-4 mt-4  justify-content-center">
+        <div class="col-9 ">
+          <div class="card">
+            {%if tipo == "Emprendedor"%}
+                <div class="card-header">Mis Inscripciones</div>
+                <div class="card-body p-0">
+             
+              {% for inscripcion in inscripciones %}
+                <div class="d-flex justify-content-between align-items-center p-3 border-bottom">
+                  <div>
+                  <p class="mb-0" style="font-size:13px; font-weight:500;">{{ inscripcion.feria }}</p>
+                  <p class="mb-0" style="font-size:11px; color:var(--ft-muted);">{{ inscripcion.feria.fecha_inicio }} — {{ inscripcion.feria.fecha_fin }}</p>
+                  </div> 
+              
+                {% if inscripcion.estado == "Confirmada" %}
+                  <div class="badge activa " >Confirmada/div>
+                  {% elif inscripcion.estado == "Lista_espera"%}
+                  <div class="badge proxima" >En lista de espera</div>
+                  {% else %}
+                  <div class="badge aviso " >Cancelada</div>
+                {% endif %}
+                <button type="submit" class="btn btn-detail-feria btn-sm m-1">Cancelar inscripcion</button>
+              
+                </div>
+              {% endfor %}
+             
+
+               {%elif tipo == "Visitante"%}
+                <div class="card-header">Mis Reseñas</div>
+                <div class="card-body p-0">
+             
+               {% for resenia in resenias %}
+                    <div class="d-flex align-items-start gap-2 p-3 border-bottom">
+                        <div class="d-flex flex-column flex-grow-1">
+                            <div class="d-flex justify-content-between align-items-center">
+                               <span style="font-size:11px; color: var(--ft-muted);">Feria: {{ resenia.feria.nombre }}</span>
+                                <span style="color: var(--ft-accent); font-size:12px;">
+                                    {% for i in "12345" %}
+                                        {% if forloop.counter <= resenia.calificacion %}★{% else %}☆{% endif %}
+                                    {% endfor %}
+                                </span>
+                            </div>
+                           
+                            <p class="mb-0 mt-1" style="font-size:12px; color: var(--ft-muted);">{{ resenia.comentario }}</p>
+                          </div>
+                      </div>
+                {% endfor %}
+              {%endif%}
+            </div>
+          </div>
+        </div>
+        
+{% endblock %}
