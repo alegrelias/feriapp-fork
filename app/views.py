@@ -196,6 +196,7 @@ class RegistroEmprendedorView(CreateView):
                 telefono=form.cleaned_data["telefono"],
                 rubro=form.cleaned_data["rubro"]
             )
+        messages.success(self.request, "Registro como Emprendedor exitoso, inicia sesión")
         return redirect(self.success_url)
 
 class RegistroVisitanteView(CreateView):
@@ -213,6 +214,7 @@ class RegistroVisitanteView(CreateView):
                 email=form.cleaned_data["email"],
                 fecha_registro=date.today()
             )
+        messages.success(self.request, "Registro como Visitante exitoso, inicia sesión")
         return redirect(self.success_url)
 
 

@@ -61,9 +61,11 @@ class RegistroEmprendedorForm(UserCreationForm):
         widget=forms.Select(attrs={"class": "form-select"})
     )
     password1 = forms.CharField(
-    widget=forms.PasswordInput(attrs={"class": "form-control"})
+        label="Contraseña",
+         widget=forms.PasswordInput(attrs={"class": "form-control"})
     )
     password2 = forms.CharField(
+        label="Confirmà la contraseña",
         widget=forms.PasswordInput(attrs={"class": "form-control"})
     )
 
@@ -88,9 +90,11 @@ class RegistroVisitanteForm(UserCreationForm):
         widget=forms.EmailInput(attrs={"class": "form-control"})
     )
     password1 = forms.CharField(
+        label="Contraseña",
     widget=forms.PasswordInput(attrs={"class": "form-control"})
     )
     password2 = forms.CharField(
+        label="Confirmá la contraseña",
         widget=forms.PasswordInput(attrs={"class": "form-control"})
     )
 
