@@ -168,9 +168,9 @@ border-top: 2px solid var(--ft-primary);
 /* ========== PERFIL ========== */
 .card-profile-logo{
     border-radius: 40px;
-    background-color:var(--ft-primary-transparent);
-    color: var(--ft-text);
-    font-weight: 500;
+    background-color:var(--ft-accent2);
+    color: var(--ft-accent);
+    font-weight: 700;
 }
 /* ========== LISTA FERIAS ========== */
 

@@ -14,7 +14,7 @@
                 <div>
                 <p class="m-2 mb-0" style="font-weight:500;">{{perfil.usuario}} </p>
                 <p class="m-2 mb-0" style=" color:var(--ft-muted);">{{perfil.email}}</p>
-                   <p class="m-2 mb-0 badge-detail-feria p-1" style="font-size:11px; color:var(--ft-text);text-align: center;">{{tipo}}</p>
+                   <p class="m-2 mb-0 badge  p-1" style="font-size:11px; color:var(--ft-primary);text-align: center; background-color: var(--ft-primary-transparent2);">{{tipo}}</p>
               </div> 
               </div>
             </div>
@@ -60,12 +60,14 @@
               
                 {% if inscripcion.estado == "Confirmada" %}
                   <div class="badge activa " >Confirmada/div>
+                  <button type="submit" class="btn realizada btn-sm m-1">Cancelar inscripcion</button>
                   {% elif inscripcion.estado == "Lista_espera"%}
                   <div class="badge proxima" >En lista de espera</div>
+                  <button type="submit" class="btn realizada btn-sm m-1">Cancelar inscripcion</button>
                   {% else %}
                   <div class="badge aviso " >Cancelada</div>
                 {% endif %}
-                <button type="submit" class="btn btn-detail-feria btn-sm m-1">Cancelar inscripcion</button>
+               
               
                 </div>
               {% endfor %}
