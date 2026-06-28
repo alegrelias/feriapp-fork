@@ -11,7 +11,9 @@ from .models import Feria, Emprendedor,Inscripcion,Categoria,Resenia,Visitante
 from datetime import date
 from django.shortcuts import redirect
 from django.http import HttpResponseRedirect
-from .forms import FeriaFormfrom .form import InscripcionForm
+from .forms import FeriaForm
+from .forms import InscripcionForm
+from django.contrib import messages
 
 
 
@@ -197,6 +199,8 @@ class NuevaInscripcionView(LoginRequiredMixin, CreateView):
             form.add_error(None, errors)
             return self.form_invalid(form)
         inscripcion.save()                     # ahora sí lo guardás
+        messages.success(self.request, "Tu inscripción se encuentra en lista de espera. Cuando sea confirmada, recibirás un correo electrónico con la información correspondiente.")
+
         return redirect("ferias:lista_ferias")  # redirigís a la lista de ferias
 
 
