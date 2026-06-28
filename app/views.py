@@ -4,7 +4,7 @@ from django.views.generic import ListView, TemplateView, DetailView, CreateView
 from django.contrib.auth.forms import UserCreationForm
 from django.urls import reverse_lazy
 from django.utils import timezone
-from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin, PermissionRequiredMixin
 from django.db.models import Count, Avg, Sum, Max, Min
 from django.db.models.functions import Round
 from .models import Feria, Emprendedor,Inscripcion,Categoria,Resenia,Visitante
@@ -190,10 +190,12 @@ class EmprendedoresListView(LoginRequiredMixin, ListView):
 # TODO: implementar las siguientes vistas:
 # class NuevaFeriaView(CreateView): ...
 
-class NuevaFeriaView(LoginRequiredMixin, CreateView):
+class NuevaFeriaView(PermissionRequiredMixin, CreateView):
 
     template_name = "ferias/nueva_feria.html"
     form_class = FeriaForm
+
+    permission_required = 'app.add_feria'
 
     def get_form(self, form_class=None):
         form = super().get_form(form_class)
@@ -291,10 +293,22 @@ class NuevaInscripcionView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
         return redirect("ferias:lista_ferias")  # redirigís a la lista de ferias
 
 
-class CancelarInscripcionView(LoginRequiredMixin, CreateView):
+class CancelarInscripcionView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
     model = Inscripcion
     template_name = 'ferias/cancelar_inscripcion.html'
     success_url = reverse_lazy('ferias:perfil')
+
+    def test_func(self):
+        inscripcion = self.get_object()
+        
+        if not hasattr(self.request.user, 'emprendedor'):
+            return False
+            
+        return inscripcion.emprendedor == self.request.user.emprendedor
+    
+    def handle_no_permission(self):
+        messages.error(self.request, "No tenés permiso para cancelar una inscripción que no es tuya.")
+        return redirect('ferias:perfil')
 
     def post(self, request, *args, **kwargs):
         inscripcion = self.get_object()
