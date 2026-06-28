@@ -44,7 +44,7 @@
           {% else %}
           <a href="{% url 'ferias:login' %}" class="btn btn-nav-primary btn-sm px-3">Iniciar Sesión</a>
           {% endif %}
-          {% if user.is_superuser %}
+          {% if user.is_staff %}
               <li class="nav-item">
                 <a class="nav-link text-warning fw-bold" href="{% url 'admin:index' %}">⚙️ Panel Admin</a>
               </li>
