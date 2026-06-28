@@ -16,6 +16,24 @@ class FeriaAdmin(admin.ModelAdmin):
 
     search_fields = ('nombre', 'ubicacion')
 
+    @admin.action(description="Marcar ferias seleccionadas como ACTIVAS")
+    def activar_ferias(self, request, queryset):
+        for feria in queryset:
+            feria.activa = True
+            feria.save()
+        
+        self.message_user(request, f"Se activaron {queryset.count()} ferias exitosamente.")
+
+    @admin.action(description="Marcar ferias seleccionadas como INACTIVAS")
+    def desactivar_ferias(self, request, queryset):
+        for feria in queryset:
+            feria.activa = False
+            feria.save()
+        
+        self.message_user(request, f"Se desactivaron {queryset.count()} ferias exitosamente.")
+    
+    actions = ['activar_ferias', 'desactivar_ferias']
+
     fieldsets = (
         ('Informacion Principal', {
             'fields': ('nombre', 'categoria', 'ubicacion')
@@ -91,6 +109,17 @@ class InscripcionAdmin(admin.ModelAdmin):
         }),
     )
 
+    @admin.action(description="Confirmar Inscripciones Seleccionadas")
+    def confirmar_inscripciones(self, request, queryset):
+        for inscripcion in queryset:
+            inscripcion.estado = 'Confirmada'
+            inscripcion.save()
+        
+        self.message_user(request, f"Se confirmaron {queryset.count()} inscripciones exitosamente.")
+    
+    actions = ['confirmar_inscripciones']
+
+
 @admin.register(Visitante)
 class VisitanteAdmin(admin.ModelAdmin):
     list_display = ('nombre', 'apellido', 'email', 'usuario', 'fecha_registro')
@@ -138,6 +167,22 @@ class SectorAdmin(admin.ModelAdmin):
     list_filter = ('feria__nombre', 'nombre', 'capacidad_puestos', 'tiene_conexion_electrica')
 
     search_fields = ('nombre', 'edicion')
+
+    @admin.action(description='Confirmar Conexion Electrica')
+    def tienen_conexion(self, request, queryset):
+        for sector in queryset:
+            sector.tiene_conexion_electrica = True
+            sector.save()
+        self.message_user(request, f"Se confirma conexion electrica de {queryset.count()} sectores exitosamente.")
+
+    @admin.action(description='Confirmar SIN Conexion Electrica')
+    def no_tienen_conexion(self, request, queryset):
+        for sector in queryset:
+            sector.tiene_conexion_electrica = False
+            sector.save()
+        self.message_user(request, f"Se confirma que no poseen conexion electrica {queryset.count()} sectores exitosamente.")
+
+    actions = ["tienen_conexion", "no_tienen_conexion"]
 
     fieldsets = (
         ('Informacion Principal', {
