@@ -1,6 +1,7 @@
 from django import forms
 from .models import Feria
 from django.utils import timezone
+from .models import Inscripcion
 
 class FeriaForm(forms.ModelForm):
 
@@ -16,7 +17,7 @@ class FeriaForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-       
+
         self.fields['categoria'].empty_label = "Seleccione una categoría"
 
         for field in self.fields.values():
@@ -24,5 +25,10 @@ class FeriaForm(forms.ModelForm):
                 field.widget.attrs.update({'class': 'form-control'})
             else:
                 field.widget.attrs.update({'class': 'form-check-input'})
-        
+
         self.fields['categoria'].widget.attrs.update({'class': 'form-select'})
+
+class InscripcionForm(forms.ModelForm):
+    class Meta:
+        model = Inscripcion
+        fields = ["numero_puesto"]  # acá van los campos

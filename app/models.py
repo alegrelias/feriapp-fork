@@ -474,11 +474,18 @@ class Inscripcion(ValidableModel):
             estado_efectivo = estado_enviado or "Lista_espera"
             instancia_id = kwargs.get("instancia_id", None)
 
+            if Inscripcion.objects.filter(
+                emprendedor=emprendedor,
+                feria=feria
+                ).exclude(estado="Cancelada").exists():
+                errors.append("Ya existe una inscripcion para este emprendedor en esta feria")
+
             if numero_puesto is not None:
                 # Validar que sea un número válido
                 if int(numero_puesto) <= 0:
                     errors.append("El número de puesto debe ser un entero positivo.")
-
+                if int (numero_puesto) > feria.capacidad_puestos:
+                    errors.append(f"El número de puesto no puede ser mayor a la capacidad de la feria ({feria.capacidad_puestos}).")
                 # Validar consistencia con el estado
                 if estado_enviado is None:
                     # Caso A: El usuario no especificó estado pero metió un número de puesto
