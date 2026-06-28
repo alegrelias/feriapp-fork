@@ -39,7 +39,7 @@ class FeriaAdmin(admin.ModelAdmin):
             'fields': ('nombre', 'categoria', 'ubicacion')
         }),
         ('Fechas y Planificacion',{
-            'fields': ('fecha_inicio', 'fecha_fin', 'activa')
+            'fields': ('fecha_inicio', 'fecha_fin', 'capacidad_puestos', 'activa')
         })
     )
 
