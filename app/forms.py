@@ -22,6 +22,14 @@ class FeriaForm(forms.ModelForm):
 
         self.fields['categoria'].empty_label = "Seleccione una categoría"
 
+        #  rango de puestos permitido a nivel formulario
+        if 'capacidad_puestos' in self.fields:
+            self.fields['capacidad_puestos'].widget.attrs.update({
+                'placeholder': 'Minimo un puesto, máximo 100',
+                'min': '1',
+                'max': '100' 
+            })
+
         for field in self.fields.values():
             if not isinstance(field.widget, forms.CheckboxInput):
                 field.widget.attrs.update({'class': 'form-control'})

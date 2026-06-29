@@ -4,7 +4,8 @@ from django.views.generic import ListView, TemplateView, DetailView, CreateView,
 from django.urls import reverse_lazy
 from django.utils import timezone
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin, PermissionRequiredMixin
-from django.db.models import Count, Avg, Sum, Max, Min
+from django.contrib.messages.views import SuccessMessageMixin
+from django.db.models import  Avg
 from django.db.models.functions import Round
 from .models import Feria, Emprendedor,Inscripcion,Categoria,Resenia,Visitante
 from datetime import date
@@ -189,12 +190,13 @@ class EmprendedoresListView(LoginRequiredMixin, ListView):
 # TODO: implementar las siguientes vistas:
 # class NuevaFeriaView(CreateView): ...
 
-class NuevaFeriaView(PermissionRequiredMixin, CreateView):
+class NuevaFeriaView(PermissionRequiredMixin,SuccessMessageMixin, CreateView):
 
     template_name = "ferias/nueva_feria.html"
     form_class = FeriaForm
-
+    success_url = reverse_lazy('ferias:lista_ferias')
     permission_required = 'app.add_feria'
+    success_message = "¡La feria se ha creado de manera exitosa!"
 
     def get_form(self, form_class=None):
         form = super().get_form(form_class)
@@ -231,7 +233,7 @@ class RegistroEmprendedorView(CreateView):
                 telefono=form.cleaned_data["telefono"],
                 rubro=form.cleaned_data["rubro"]
             )
-        messages.success(self.request, "Registro como Emprendedor exitoso")
+        messages.success(self.request, "Registro como Emprendedor exitoso, inicie sesión")
         return redirect(self.success_url)
 
 class RegistroVisitanteView(CreateView):

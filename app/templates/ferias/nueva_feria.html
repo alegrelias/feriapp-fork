@@ -7,7 +7,7 @@
 
         <div class="card shadow-sm mt-4">
 
-            <div class="card-header bg-success text-white">
+            <div class="card-header detail-header text-white">
                 <h2 class="mb-0">Nueva Feria</h2>
             </div>
 
@@ -18,12 +18,12 @@
 
                     {{ form.as_p }}
 
-                    <button type="submit" class="btn btn-success">
+                    <button type="submit" class="btn btn-detail-feria">
                         Guardar
                     </button>
 
                     <a href="{% url 'ferias:lista_ferias' %}"
-                       class="btn btn-secondary">
+                       class="btn realizada">
                         Cancelar
                     </a>
 
