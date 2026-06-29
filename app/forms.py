@@ -33,7 +33,8 @@ class FeriaForm(forms.ModelForm):
 class InscripcionForm(forms.ModelForm):
     class Meta:
         model = Inscripcion
-        fields = ["numero_puesto"]  # acá van los campos
+        fields = []  #Queda vacio porque no queremos que el usuario pueda modificar ningún campo de la inscripción, ya que se completan automáticamente en la vista.
+
 
 
 
@@ -104,4 +105,3 @@ class RegistroVisitanteForm(UserCreationForm):
         widgets = {
             "username": forms.TextInput(attrs={"class": "form-control"}),
         }
-    

@@ -15,6 +15,8 @@ urlpatterns = [
     # TODO:
     path("ferias/nueva/", views.NuevaFeriaView.as_view(), name="nueva_feria"),
     path("ferias/<int:pk>/inscripcion/", views.NuevaInscripcionView.as_view(), name="nueva_inscripcion"),
+    path("ferias/<int:pk>/inscripcion/cancelar/", views.CancelarInscripcionView.as_view(), name="cancelar_inscripcion"),
+    
 
     #LOGIN, LOGOUT y REGISTRO
     path('login/', auth_views.LoginView.as_view(template_name='ferias/registration/login.html', redirect_authenticated_user=True), name='login'),

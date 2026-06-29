@@ -6,7 +6,7 @@
  <div class="row mb-4 mt-4  justify-content-center">
         <div class="col-9 ">
           <div class="card">
-    
+
             <div class="card-header">Mis Datos</div>
             <div class="card-body p-0">
               <div class="d-flex justify-content-start align-items-center p-3 border-bottom ">
@@ -15,7 +15,7 @@
                 <p class="m-2 mb-0" style="font-weight:500;">{{perfil.usuario}} </p>
                 <p class="m-2 mb-0" style=" color:var(--ft-muted);">{{perfil.email}}</p>
                    <p class="m-2 mb-0 badge  p-1" style="font-size:11px; color:var(--ft-primary);text-align: center; background-color: var(--ft-primary-transparent2);">{{tipo}}</p>
-              </div> 
+              </div>
               </div>
             </div>
 
@@ -38,7 +38,7 @@
                     <p class="m-2 mb-0" style="font-size:11px; color:var(--ft-muted);">Telefono </p>
                    <p class="m-2 mb-0" style="font-size:13px; font-weight:500;">{{perfil.telefono}}</p>
                      {%endif%}
-              </div> 
+              </div>
               </div>
             </div>
           </div>
@@ -50,33 +50,39 @@
             {%if tipo == "Emprendedor"%}
                 <div class="card-header">Mis Inscripciones</div>
                 <div class="card-body p-0">
-             
+
               {% for inscripcion in inscripciones %}
                 <div class="d-flex justify-content-between align-items-center p-3 border-bottom">
                   <div>
                   <p class="mb-0" style="font-size:13px; font-weight:500;">{{ inscripcion.feria }}</p>
                   <p class="mb-0" style="font-size:11px; color:var(--ft-muted);">{{ inscripcion.feria.fecha_inicio }} — {{ inscripcion.feria.fecha_fin }}</p>
-                  </div> 
-              
+                  </div>
+
                 {% if inscripcion.estado == "Confirmada" %}
-                  <div class="badge activa " >Confirmada/div>
+                  <div class="badge activa" >Confirmada</div>
+                  <form action ="{% url 'ferias:cancelar_inscripcion' inscripcion.pk %}" method="post" class="display:inline;">
+                  {% csrf_token %}
                   <button type="submit" class="btn realizada btn-sm m-1">Cancelar inscripcion</button>
+                  </form>
                   {% elif inscripcion.estado == "Lista_espera"%}
                   <div class="badge proxima" >En lista de espera</div>
+                  <form action ="{% url 'ferias:cancelar_inscripcion' inscripcion.pk %}" method="post" class="display:inline;">
+                  {% csrf_token %}
                   <button type="submit" class="btn realizada btn-sm m-1">Cancelar inscripcion</button>
+                  </form>
                   {% else %}
                   <div class="badge aviso " >Cancelada</div>
                 {% endif %}
-               
-              
+
+
                 </div>
               {% endfor %}
-             
+
 
                {%elif tipo == "Visitante"%}
                 <div class="card-header">Mis Reseñas</div>
                 <div class="card-body p-0">
-             
+
                {% for resenia in resenias %}
                     <div class="d-flex align-items-start gap-2 p-3 border-bottom">
                         <div class="d-flex flex-column flex-grow-1">
@@ -88,7 +94,7 @@
                                     {% endfor %}
                                 </span>
                             </div>
-                           
+
                             <p class="mb-0 mt-1" style="font-size:12px; color: var(--ft-muted);">{{ resenia.comentario }}</p>
                           </div>
                       </div>
@@ -97,5 +103,5 @@
             </div>
           </div>
         </div>
-        
+
 {% endblock %}

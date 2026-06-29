@@ -1,6 +1,6 @@
 """Vistas públicas de la aplicación de ferias."""
 
-from django.views.generic import ListView, TemplateView, DetailView, CreateView
+from django.views.generic import ListView, TemplateView, DetailView, CreateView, View
 from django.contrib.auth.forms import UserCreationForm
 from django.urls import reverse_lazy
 from django.utils import timezone
@@ -9,7 +9,7 @@ from django.db.models import Count, Avg, Sum, Max, Min
 from django.db.models.functions import Round
 from .models import Feria, Emprendedor,Inscripcion,Categoria,Resenia,Visitante
 from datetime import date
-from django.shortcuts import redirect
+from django.shortcuts import redirect, get_object_or_404
 from django.http import HttpResponseRedirect
 from .forms import FeriaForm, RegistroEmprendedorForm,RegistroVisitanteForm
 from .forms import InscripcionForm
@@ -124,11 +124,11 @@ class FeriasDetailView(LoginRequiredMixin, DetailView):
         try:
             emprendedor = self.request.user.emprendedor  #  acceder al emprendedor
         except:
-            
+
             try:
                 visitante = self.request.user.visitante
             except:
-            
+
                 perfil = self.request.user
 
         inscripciones = Inscripcion.objects.filter(
@@ -153,11 +153,11 @@ class FeriasDetailView(LoginRequiredMixin, DetailView):
         comentario = request.POST.get("comentario")
         calificacion = request.POST.get("calificacion")
         visitante = None
-          
+
         try:
             visitante = self.request.user.visitante
         except:
-                 
+
             messages.warning(self.request, "Solo los visitantes pueden dejar reseñas")
             return redirect("ferias:detalle_feria", pk=feria.pk)
 
@@ -240,8 +240,8 @@ class RegistroVisitanteView(CreateView):
     form_class = RegistroVisitanteForm
     success_url = reverse_lazy('ferias:login')
 
-   
-        
+
+
 
     def form_valid(self, form):
         with transaction.atomic():
@@ -264,23 +264,23 @@ class NuevaInscripcionView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
     template_name = 'ferias/nueva_inscripcion.html'
 
     def test_func(self):
-       
+
         # si el usuario tiene atributo emprendedor, Si da False, el motor de Django hace: 'self.handle_no_permission()'
         return hasattr(self.request.user, 'emprendedor')
 
     def handle_no_permission(self):
         """
          se ejeecuta solo si test_func() devuelve False
-      
+
         """
         messages.warning(self.request, "Acceso denegado: Debes registrar un perfil de Emprendedor para inscribirte.")
-        
+
         return redirect("ferias:lista_ferias")
 
     def form_valid(self, form):
         inscripcion = form.save(commit=False)  # crea el objeto pero NO lo guarda todavía
-        inscripcion.feria = Feria.objects.get(pk=self.kwargs["pk"])  
-        inscripcion.emprendedor = Emprendedor.objects.first()
+        inscripcion.feria = Feria.objects.get(pk=self.kwargs["pk"])
+        inscripcion.emprendedor = self.request.user.emprendedor
         inscripcion.registrado_por = inscripcion.emprendedor
         errors = Inscripcion.validate(emprendedor=inscripcion.emprendedor, feria=inscripcion.feria,
         numero_puesto=inscripcion.numero_puesto, registrado_por=inscripcion.registrado_por, estado=inscripcion.estado)
@@ -293,29 +293,32 @@ class NuevaInscripcionView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
         return redirect("ferias:lista_ferias")  # redirigís a la lista de ferias
 
 
-class CancelarInscripcionView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
+class CancelarInscripcionView(LoginRequiredMixin, UserPassesTestMixin, View):
     model = Inscripcion
     template_name = 'ferias/cancelar_inscripcion.html'
     success_url = reverse_lazy('ferias:perfil')
 
     def test_func(self):
-        inscripcion = self.get_object()
-        
+        inscripcion = get_object_or_404(Inscripcion, pk=self.kwargs.get('pk'))
+
         if not hasattr(self.request.user, 'emprendedor'):
             return False
-            
+
         return inscripcion.emprendedor == self.request.user.emprendedor
-    
+
     def handle_no_permission(self):
         messages.error(self.request, "No tenés permiso para cancelar una inscripción que no es tuya.")
         return redirect('ferias:perfil')
 
     def post(self, request, *args, **kwargs):
-        inscripcion = self.get_object()
+        inscripcion = get_object_or_404(Inscripcion, pk=self.kwargs.get('pk'))
         inscripcion.estado = "Cancelada"
         inscripcion.save()
+        messages.success(self.request, "Inscripción cancelada exitosamente.")
         return redirect(self.success_url)
 
     def get_object(self, queryset=None):
         inscripcion_id = self.kwargs.get('pk')
         return Inscripcion.objects.get(pk=inscripcion_id)
+
+
