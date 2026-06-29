@@ -1,7 +1,6 @@
 """Vistas públicas de la aplicación de ferias."""
 
 from django.views.generic import ListView, TemplateView, DetailView, CreateView, View
-from django.contrib.auth.forms import UserCreationForm
 from django.urls import reverse_lazy
 from django.utils import timezone
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin, PermissionRequiredMixin

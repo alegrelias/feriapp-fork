@@ -4,26 +4,26 @@
 
 {% block content %}
 <div class="row justify-content-center mt-5">
-    <div class="col-md-5">
+    <div class=" col-6">
         <div class="card shadow-sm">
-            <div class="card-header bg-success text-white text-center py-3">
+            <div class="card-header detail-header text-white text-center py-3">
                 <h3 class="mb-0">Iniciar Sesión</h3>
             </div>
-            <div class="card-body p-4">
+            <div class="card-body p-3 ">
                 
-                <form method="post">
+                <form method="post" class="d-flex flex-column flex-nowrap align-content-center">
                     {% csrf_token %}
                     {{ form.as_p }}
                     
                     <div class="d-grid gap-2 mt-4">
-                        <button type="submit" class="btn btn-success">Ingresar</button>
+                        <button type="submit" class="btn btn-detail-feria">Ingresar</button>
                     </div>
                 </form>
 
             </div>
             <div class="card-footer text-center bg-light py-3">
                 <span class="text-muted fs-6">¿No tenés cuenta?</span>
-                <a href="{% url 'ferias:registro' %}" class="btn btn-sm btn-outline-success ms-2">Registrarse</a>
+                <a href="{% url 'ferias:registro' %}" class="btn btn-sm btn-outline-feria ms-2">Registrarse</a>
             </div>
         </div>
     </div>
