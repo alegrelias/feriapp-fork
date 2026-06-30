@@ -349,7 +349,7 @@ class CancelarInscripcionView(LoginRequiredMixin, UserPassesTestMixin, View):
         inscripcion = get_object_or_404(Inscripcion, pk=self.kwargs.get('pk'))
        
         errors = inscripcion.update(
-        estado='Confirmada',
+        estado='Cancelada',
         )
         if errors:
             for e in errors:
