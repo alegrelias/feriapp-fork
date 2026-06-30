@@ -16,6 +16,8 @@ urlpatterns = [
     path("ferias/nueva/", views.NuevaFeriaView.as_view(), name="nueva_feria"),
     path("ferias/<int:pk>/inscripcion/", views.NuevaInscripcionView.as_view(), name="nueva_inscripcion"),
     path("ferias/<int:pk>/inscripcion/cancelar/", views.CancelarInscripcionView.as_view(), name="cancelar_inscripcion"),
+    path("ferias/<int:pk>/inscripcion/aprobar/", views.AprobarInscripcionView.as_view(), name="aprobar_inscripcion"),
+    
     
 
     #LOGIN, LOGOUT y REGISTRO

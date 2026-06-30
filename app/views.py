@@ -47,7 +47,7 @@ class HomeView(TemplateView):
 
 class PerfilView(LoginRequiredMixin,TemplateView):
     template_name = "ferias/perfil.html"
-    permission_required = 'app.change_inscripcion'
+    
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -314,10 +314,13 @@ class CancelarInscripcionView(LoginRequiredMixin, UserPassesTestMixin, View):
     success_url = reverse_lazy('ferias:perfil')
 
     def test_func(self):
+        user = self.request.user
         inscripcion = get_object_or_404(Inscripcion, pk=self.kwargs.get('pk'))
 
         if not hasattr(self.request.user, 'emprendedor'):
-            return False
+            return user.has_perm('app.change_inscripcion')
+      
+    
 
         return inscripcion.emprendedor == self.request.user.emprendedor
 
@@ -337,16 +340,17 @@ class CancelarInscripcionView(LoginRequiredMixin, UserPassesTestMixin, View):
         return Inscripcion.objects.get(pk=inscripcion_id)
 
 
-class AprobarInscripcionRapidaView(PermissionRequiredMixin, View):
+class AprobarInscripcionView(PermissionRequiredMixin, View):
     permission_required = 'app.change_inscripcion'
+   
 
     def post(self, request, *args, **kwargs):
         # Tomamos el ID de la URL o del POST
         inscripcion = get_object_or_404(Inscripcion, pk=self.kwargs['pk'])
-        inscripcion.estado = 'APROBADA'
+        inscripcion.estado = 'Confirmada'
         inscripcion.save()
         
-        messages.success(request, f"Inscripción aprobada con éxito.")
+        messages.success(request, "Inscripción aprobada con éxito.")
         # Te manda de vuelta al perfil de donde viniste
         return redirect('ferias:perfil')
 

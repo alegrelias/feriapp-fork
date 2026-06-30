@@ -88,6 +88,70 @@ body {
     background-color: var(--ft-action);
     color: var(--color-hueso);
 }
+.badge-feria.aviso {
+    background-color: #fee2e2;
+    color: #ef4444;
+    border: 1px solid #fca5a5;
+}
+
+.btn-feria-warning {
+    background-color: var(--accent-warm2);
+    color: #1a3a5c; /* Alto contraste oscuro */
+    border: 1px solid var(--accent-warm2);
+    padding: 0.375rem 0.75rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    border-radius: 0.375rem;
+    transition: all 0.2s ease-in-out;
+    cursor: pointer;
+}
+
+.btn-feria-warning:hover {
+    background-color: #e6a343;
+    border-color: #e6a343;
+}
+
+/* Botón Secundario / Cancelar (Blue Dark) */
+.btn-feria-dark {
+    background-color: var(--bs-blue);
+    color: #ffffff;
+    border: 1px solid var(--bs-blue);
+    padding: 0.375rem 0.75rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    border-radius: 0.375rem;
+    transition: all 0.2s ease-in-out;
+    cursor: pointer;
+}
+
+.btn-feria-dark:hover {
+    background-color: #122942;
+    border-color: #122942;
+}
+
+.badge-feria {
+    display: inline-block;
+    padding: 0.35em 0.65em;
+    font-size: 0.75rem;
+    font-weight: 600;
+    line-height: 1;
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: baseline;
+    border-radius: 0.375rem;
+}
+
+.badge-feria.activa {
+    background-color: rgba(18, 178, 159, 0.15);
+    color: var(--ft-accent);
+    border: 1px solid rgba(18, 178, 159, 0.3);
+}
+
+.badge-feria.espera {
+    background-color: var(--ft-primary-transparent);
+    color: #4a3f9e; /* Variación oscura para legibilidad sobre el lila claro */
+    border: 1px solid var(--ft-primary-solid);
+}
 
 .hero-main{
     background-color: var(--color-hueso);
@@ -198,14 +262,7 @@ border-top: 2px solid var(--ft-primary);
     color: white;
 }
 
-.badge-feria {
-    background: #EEEDFE;
-    color: var(--ft-primary);
-    border-radius: 20px;
-    font-size: 11px;
-    font-weight: 500;
-    padding: 3px 10px;
-}
+
 /* ========== FERIA DETAIL ========== */
 
 .card-detail-feria{
