@@ -47,11 +47,13 @@ class HomeView(TemplateView):
 
 class PerfilView(LoginRequiredMixin,TemplateView):
     template_name = "ferias/perfil.html"
+    permission_required = 'app.change_inscripcion'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         emprendedor = None
         visitante = None
+        context["inscripciones_a_evaluar"] = Inscripcion.objects.filter(estado__in=["Lista_espera", "Confirmada"])
         try:
             emprendedor = self.request.user.emprendedor  #  acceder al emprendedor
         except:
@@ -291,7 +293,7 @@ class NuevaInscripcionView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
         inscripcion.save()                     # ahora sí se guarda
         messages.success(self.request, "Tu inscripción se encuentra en lista de espera. Cuando sea confirmada, recibirás un correo electrónico con la información correspondiente.")
 
-        return redirect("ferias:lista_ferias")  # redirigís a la lista de ferias
+        return redirect("ferias:lista_ferias")  # redirige a la lista de ferias
 
 
 class CancelarInscripcionView(LoginRequiredMixin, UserPassesTestMixin, View):
@@ -322,4 +324,17 @@ class CancelarInscripcionView(LoginRequiredMixin, UserPassesTestMixin, View):
         inscripcion_id = self.kwargs.get('pk')
         return Inscripcion.objects.get(pk=inscripcion_id)
 
+
+class AprobarInscripcionRapidaView(PermissionRequiredMixin, View):
+    permission_required = 'app.change_inscripcion'
+
+    def post(self, request, *args, **kwargs):
+        # Tomamos el ID de la URL o del POST
+        inscripcion = get_object_or_404(Inscripcion, pk=self.kwargs['pk'])
+        inscripcion.estado = 'APROBADA'
+        inscripcion.save()
+        
+        messages.success(request, f"Inscripción aprobada con éxito.")
+        # Te manda de vuelta al perfil de donde viniste
+        return redirect('ferias:perfil')
 
