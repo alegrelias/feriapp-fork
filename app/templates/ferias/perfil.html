@@ -126,6 +126,48 @@
 
     </div>
               </div>
+
+
+
+              {% elif tipo == 'Emprendedor' %}
+              <div class="col-12 col-md-6">
+              <div class="card">
+              <div class="card-header">Mi actividad</div>
+    <div class="card-body p-0">
+
+        <div class="d-flex justify-content-around p-3 border-bottom text-center">
+            <div>
+                <p class="mb-0" style="font-size:20px; font-weight:600; color:var(--ft-primary);">{{ total_inscripciones }}</p>
+                <p class="mb-0" style="font-size:11px; color:var(--ft-muted);">Inscripciones totales</p>
+            </div>
+            <div>
+                <p class="mb-0" style="font-size:20px; font-weight:600; color:var(--ft-primary);">{{ total_confirmadas }}</p>
+                <p class="mb-0" style="font-size:11px; color:var(--ft-muted);">Confirmadas</p>
+            </div>
+        </div>
+
+        <div class="p-3 pb-2">
+            <p class="mb-0" style="font-size:12px; font-weight:600; color:var(--ft-muted);">FERIAS DISPONIBLES PARA INSCRIBIRSE</p>
+        </div>
+
+        {% for feria in ferias_disponibles %}
+            <div class="d-flex justify-content-between align-items-center p-3 border-bottom">
+                <div>
+                    <p class="mb-0" style="font-size:13px; font-weight:500;">{{ feria.nombre }}</p>
+                    <p class="mb-0" style="font-size:11px; color:var(--ft-muted);">{{ feria.fecha_inicio }} — {{ feria.fecha_fin }}</p>
+                </div>
+                <a href="{% url 'ferias:nueva_inscripcion' feria.pk %}" class="btn btn-sm btn-feria-dark">Inscribirme</a>
+            </div>
+        {% empty %}
+            <div class="text-center p-4" style="color: var(--ft-muted);">
+                <p class="mb-0" style="font-size:13px;">No hay ferias disponibles por el momento.</p>
+            </div>
+        {% endfor %}
+
+    </div>
+    </div>
+    </div>
+{% endif
               {% endif%}
           
 </div>

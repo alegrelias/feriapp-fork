@@ -76,10 +76,10 @@ pip install -r requirements.txt
 python manage.py migrate
 ```
 
-### 5. Crear superusuario (para el panel admin)
+### 5. Crear usuarios de prueba, SuperUsuario, Emprendedor y Visitante
 
 ```bash
-python manage.py createsuperuser
+python manage.py cargar_datos_prueba
 ```
 
 ### 6. Correr el servidor de desarrollo
@@ -112,11 +112,14 @@ python manage.py test ferias.tests.test_views -v 2
 
 > ⚠️ Solo para uso del corrector en entorno de desarrollo local.
 
-| Rol | Usuario | Contraseña |
-|-----|---------|-----------|
-| Superusuario / Admin | `admin` | `admin1234` |
-| Usuario de prueba | `usuario_prueba` | `prueba1234` |
-
+| Rol | Usuario | Contraseña | Nombre |
+|-----|---------|-----------|--------|
+| Superusuario / Admin | `admin` | `admin1234` | — |
+| Emprendedor | `emprendedor1` | `test1234` | Juan Pérez |
+| Emprendedor | `emprendedor2` | `test1234` | María López |
+| Emprendedor | `emprendedor3` | `test1234` | Carlos Ruiz |
+| Visitante | `visitante1` | `test1234` | Ana Gómez |
+| Visitante | `visitante2` | `test1234` | Pedro Díaz |
 ---
 
 ## 📁 Estructura del proyecto
@@ -165,7 +168,7 @@ feriapp/
 
 ## 🧩 Decisiones de diseño
 
-> *(Mínimo 200 palabras — completar antes de la entrega final)*
+
 
 Describir aquí:
 - Por qué eligieron este dominio
@@ -232,6 +235,17 @@ Nuestro objetivo fue construir una aplicación mantenible y coherente. La incorp
 - [ ] Barra de búsqueda por nombre o ubicación
 - [ ] Permisos diferenciados (Organizador vs. Emprendedor)
 - [ ] Tests de integración (flujo completo)
+
+---
+
+## Probar el sistema de permisos
+
+1. Iniciar sesión como `admin` / `admin1234`
+2. Ir a `/admin/auth/user/`
+3. Elegír cualquier usuario (ej: `emprendedor1`) y editarlo
+4. En la sección "Permisos de usuario",  asignar el permiso `app | inscripcion | Can change inscripcion`
+5. Guardar los cambios
+6. Cerrár sesión e iniciar nuevamente con ese usuario para verificar que ahora puede aprobar/cancelar inscripciones
 
 ---
 

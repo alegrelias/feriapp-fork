@@ -71,9 +71,20 @@ class PerfilView(LoginRequiredMixin,TemplateView):
             #inscripciones_emprendedor es el related name que se le inyecta como atributo a emprendedor
             #SELECT * FROM mi_app_inscripcion WHERE emprendedor_id = [ID del emprendedor actual];
             #  con select related hace el join con Feria para evitar viajar 2 veces a la bd
+            inscripciones = emprendedor.inscripciones_emprendedor.select_related('feria')
             context["inscripciones"] = emprendedor.inscripciones_emprendedor.select_related('feria')
             context["perfil"] = emprendedor
             context["tipo"] = "Emprendedor"
+
+          
+            context['total_inscripciones'] = inscripciones.count()
+            context['total_confirmadas'] = inscripciones.filter(estado='Confirmada').count()
+
+            # ferias donde el emprendedor todavía no se inscribió (ni siquiera en lista de espera/cancelada)
+            ferias_inscriptas_ids = inscripciones.values_list('feria_id', flat=True)
+            context['ferias_disponibles'] = Feria.objects.filter(
+                activa=True, fecha_inicio__gte=date.today()
+            ).exclude(id__in=ferias_inscriptas_ids)[:3]
 
         elif visitante:
             
