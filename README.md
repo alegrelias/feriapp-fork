@@ -176,6 +176,54 @@ Describir aquí:
 
 ---
 
+# Elección del dominio y motivación
+
+Elegimos desarrollar FeriApp porque nos permitía trabajar con una problemática cercana a una situación real, donde no solo era necesario almacenar información, sino también administrar reglas de negocio. El sistema debía gestionar ferias, emprendedores, visitantes e inscripciones, contemplando restricciones como la disponibilidad de puestos, los distintos estados de las inscripciones y diferentes tipos de usuarios.
+
+Además, al ser nuestro primer proyecto grande utilizando Django, nos pareció un dominio adecuado para aprender a modelar relaciones entre entidades, trabajar con el ORM, formularios, vistas, autenticación y persistencia de datos, integrando también herramientas como Git para el trabajo colaborativo.
+
+# Modelado de la disponibilidad de puestos
+
+Decidimos no almacenar la cantidad de puestos ocupados o disponibles como atributos de la base de datos. En su lugar, esa información se calcula dinámicamente mediante métodos del modelo (puestos_ocupados(), puestos_disponibles() y tiene_lugar()), utilizando el estado actual de las inscripciones.
+
+Elegimos este enfoque porque evita duplicar información y reduce el riesgo de inconsistencias si una inscripción cambia de estado. Además, estos métodos se reutilizan en las vistas para mostrar la barra de ocupación de cada feria y generar estadísticas generales del sistema.
+
+# Validaciones en el modelo y en el formulario
+
+Una de las decisiones más importantes fue centralizar las reglas de negocio en los modelos. Durante el desarrollo observamos que todos seguían el mismo proceso al crear o actualizar objetos: validar los datos y, si eran correctos, guardarlos en la base de datos. Para evitar repetir esa lógica implementamos una clase abstracta llamada ValidableModel, que concentra el comportamiento común de validate(), new() y update(). De esta manera, todos los modelos siguen el mismo flujo y solo deben implementar sus propias reglas de validación.
+
+En Feria se valida la coherencia de las fechas y la capacidad de puestos. En Inscripción, donde se concentra la mayor parte de la lógica del sistema, se controla que un emprendedor no pueda inscribirse dos veces en la misma feria, que un puesto solo pueda asignarse a inscripciones en lista de espera y que no existan dos inscripciones confirmadas ocupando el mismo puesto mediante el método existe_puesto(). También se restringen modificaciones que romperían la lógica del sistema, como cambiar el emprendedor o la feria de una inscripción ya existente.
+
+Los formularios y las vistas quedaron enfocados en la interacción con el usuario, se personalizaron widgets, tipos de entrada y estilos utilizando Bootstrap, mientras que las reglas del negocio permanecieron centralizadas en los modelos.
+
+# División del trabajo
+
+El desarrollo del proyecto se organizó distribuyendo las principales responsabilidades entre los integrantes del equipo. Si bien cada uno estuvo a cargo de un conjunto de funcionalidades, el trabajo fue integrándose de forma continua mediante Git y GitHub, realizando revisiones cruzadas, correcciones y ajustes para mantener un diseño uniforme y respetar las decisiones de arquitectura adoptadas para toda la aplicación.
+
+# La distribución inicial de tareas fue la siguiente:
+
+Arquitectura de autenticación y administración: implementación del registro, inicio y cierre de sesión de usuarios, /navegación dinámica según el estado de autenticación y configuración del panel de administración de Django.
+Consultas y vistas de información: desarrollo de la página principal con estadísticas generales, listado de ferias con filtro por categorías, listado de emprendedores y perfil de usuario.
+Gestión de ferias: implementación del detalle de cada feria, mostrando la información general, los emprendedores inscriptos y el porcentaje de ocupación de puestos, además del formulario para crear nuevas ferias.
+Gestión de inscripciones: desarrollo del proceso de inscripción de emprendedores a una feria, visualización de las inscripciones realizadas, cancelación de inscripciones y sistema de reseñas de los asistentes.
+
+Aunque inicialmente existió una división de actividades, varias decisiones se tomaron en conjunto. Entre ellas, la creación de la clase abstracta ValidableModel para reutilizar la lógica de validación y persistencia, la definición de las reglas de negocio de las inscripciones, el modelado de la disponibilidad de puestos y la organización general de la arquitectura del proyecto. En relación a lo dicho, esto nos permitió mantener un criterio común durante todo el desarrollo y facilitar la integración del trabajo realizado por cada integrante.
+
+# Otras decisiones
+
+Además de las decisiones anteriores, incorporamos algunos cambios para mejorar la organización del sistema. Implementamos managers personalizados para encapsular consultas frecuentes, como listar emprendedores ordenados o recuperar las inscripciones confirmadas, evitando repetir consultas en las vistas.
+
+Por otra parte, tomamos algunas decisiones de modelado que se apartan levemente del diagrama original. En esta ocasión, decidimos vincular las reseñas directamente con la feria y no con el emprendedor. Consideramos que el objetivo de una reseña es evaluar la experiencia general del visitante durante la feria (organización, infraestructura, ubicación, etc.) y no el desempeño de un expositor en particular. De esta manera, una misma feria puede recibir múltiples reseñas que reflejen la percepción global de los asistentes.
+
+Por último, el control del flujo de creación se realiza utilizando form.save(commit=False), lo que permite completar datos que no provienen del formulario y ejecutar las validaciones del modelo antes de guardar definitivamente el objeto en la base de datos.
+
+# Aprendizajes
+
+El proyecto fue evolucionando a medida que avanzábamos en el aprendizaje de Python, Django y el trabajo colaborativo con Git. Varias decisiones fueron apareciendo durante el desarrollo, cuando detectamos código repetido, responsabilidades mal distribuidas o reglas de negocio que podían centralizarse mejor.
+
+Nuestro objetivo fue construir una aplicación mantenible y coherente. La incorporación de una clase base reutilizable, la separación de responsabilidades, el uso de managers personalizados y la centralización de las validaciones para contribuir a la arquitectura del proyecto.
+
+
 ## ⭐ Funcionalidades opcionales implementadas
 
 - [ ] Vista "Mis inscripciones" para el emprendedor autenticado
