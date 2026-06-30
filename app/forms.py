@@ -27,7 +27,7 @@ class FeriaForm(forms.ModelForm):
             self.fields['capacidad_puestos'].widget.attrs.update({
                 'placeholder': 'Minimo un puesto, máximo 100',
                 'min': '1',
-                'max': '100' 
+                'max': '100'
             })
 
         for field in self.fields.values():
@@ -41,9 +41,48 @@ class FeriaForm(forms.ModelForm):
 class InscripcionForm(forms.ModelForm):
     class Meta:
         model = Inscripcion
-        fields = []  #Queda vacio porque no queremos que el usuario pueda modificar ningún campo de la inscripción, ya que se completan automáticamente en la vista.
+        fields = ["emprendedor", "feria", "numero_puesto", "estado", "registrado_por"]
+
+        widgets = {
+            'emprendedor': forms.Select(attrs={'class': 'form-select'}),
+            'feria': forms.Select(attrs={'class': 'form-select'}),
+            'numero_puesto': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Ej: 14'}),
+            'estado': forms.Select(attrs={'class': 'form-select'}),
+            'registrado_por': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Nombre del operador'}),
+        }
+
+    def __init__(self, *args, **kwargs):
+        feria_id = kwargs.pop('feria', None)
+        emprendedor_id = kwargs.pop('emprendedor', None)
+
+        super().__init__(*args, **kwargs)
 
 
+        if feria_id and 'feria' in self.fields:
+            self.initial['feria'] = feria_id
+
+        if emprendedor_id and 'emprendedor' in self.fields:
+            self.initial['emprendedor'] = emprendedor_id
+
+        #aplicamos estilos y bloqueos
+        for field_name, field in self.fields.items():
+            if field_name == 'numero_puesto':
+                field.widget.attrs.update({
+                    'class': 'form-control',
+                    'placeholder': 'Ej: 14'
+                })
+            elif field_name == 'registrado_por':
+                field.widget.attrs.update({
+                    'class': 'form-control',
+                    'placeholder': 'Ej: Juan Pérez'
+                })
+            else:
+                field.widget.attrs.update({
+                    'readonly': 'readonly',
+                    'class': 'form-control bg-light text-muted',
+                    'style': 'pointer-events: none; cursor: not-allowed;',
+                    'tabindex': '-1' #evita que el usuario llegue al campo usando la tecla TAB
+                })
 
 
 class RegistroEmprendedorForm(UserCreationForm):
