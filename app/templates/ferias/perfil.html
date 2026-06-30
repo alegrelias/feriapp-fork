@@ -129,7 +129,7 @@
 
 
 
-              {% elif tipo == 'Emprendedor' %}
+              {% elif tipo == 'Emprendedor' and not perms.app.change_inscripcion%}
               <div class="col-12 col-md-6">
               <div class="card">
               <div class="card-header">Mi actividad</div>
@@ -167,7 +167,7 @@
     </div>
     </div>
     </div>
-{% endif
+
               {% endif%}
           
 </div>
