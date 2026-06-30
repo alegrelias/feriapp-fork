@@ -242,7 +242,7 @@ Elegimos este enfoque porque evita duplicar información y reduce el riesgo de i
 
 Una de las decisiones más importantes fue centralizar las reglas de negocio en los modelos. Durante el desarrollo observamos que todos seguían el mismo proceso al crear o actualizar objetos: validar los datos y, si eran correctos, guardarlos en la base de datos. Para evitar repetir esa lógica implementamos una clase abstracta llamada ValidableModel, que concentra el comportamiento común de validate(), new() y update(). De esta manera, todos los modelos siguen el mismo flujo y solo deben implementar sus propias reglas de validación.
 
-En Feria se valida la coherencia de las fechas y la capacidad de puestos. En Inscripción, donde se concentra la mayor parte de la lógica del sistema, se controla que un emprendedor no pueda inscribirse dos veces en la misma feria, que un puesto solo pueda asignarse a inscripciones en lista de espera y que no existan dos inscripciones confirmadas ocupando el mismo puesto mediante el método existe_puesto(). También se restringen modificaciones que romperían la lógica del sistema, como cambiar el emprendedor o la feria de una inscripción ya existente.
+En Feria se valida la coherencia de las fechas y la capacidad de puestos. En Inscripción, donde se concentra la mayor parte de la lógica del sistema, se controla que un emprendedor no pueda inscribirse dos veces en la misma feria, que un puesto solo pueda asignarse a inscripciones confirmadas y que no existan dos inscripciones confirmadas ocupando el mismo puesto mediante el método existe_puesto(). También se restringen modificaciones que romperían la lógica del sistema, como cambiar el emprendedor o la feria de una inscripción ya existente.
 
 Los formularios y las vistas quedaron enfocados en la interacción con el usuario, se personalizaron widgets, tipos de entrada y estilos utilizando Bootstrap, mientras que las reglas del negocio permanecieron centralizadas en los modelos.
 
@@ -264,6 +264,8 @@ Aunque inicialmente existió una división de actividades, varias decisiones se 
 Además de las decisiones anteriores, incorporamos algunos cambios para mejorar la organización del sistema. Implementamos managers personalizados para encapsular consultas frecuentes, como listar emprendedores ordenados o recuperar las inscripciones confirmadas, evitando repetir consultas en las vistas.
 
 Por otra parte, tomamos algunas decisiones de modelado que se apartan levemente del diagrama original. En esta ocasión, decidimos vincular las reseñas directamente con la feria y no con el emprendedor. Consideramos que el objetivo de una reseña es evaluar la experiencia general del visitante durante la feria (organización, infraestructura, ubicación, etc.) y no el desempeño de un expositor en particular. De esta manera, una misma feria puede recibir múltiples reseñas que reflejen la percepción global de los asistentes.
+
+(![Digrama de Entidad Relación](image.png))
 
 Por último, el control del flujo de creación se realiza utilizando form.save(commit=False), lo que permite completar datos que no provienen del formulario y ejecutar las validaciones del modelo antes de guardar definitivamente el objeto en la base de datos.
 
