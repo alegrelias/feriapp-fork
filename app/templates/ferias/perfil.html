@@ -38,6 +38,10 @@
                                   <p class="m-2 mb-0" style="font-size:11px; color:var(--ft-muted);">Telefono </p>
                                 <p class="m-2 mb-0" style="font-size:13px; font-weight:500;">{{perfil.telefono}}</p>
                                   {%endif%}
+                                  {% if tipo == "Visitante" %}
+                                  <p class="m-2 mb-0" style="font-size:11px; color:var(--ft-muted);">Miembro desde</p>
+                                  <p class="m-2 mb-0" style="font-size:13px; font-weight:500;">{{ perfil.fecha_registro }}</p>
+                              {% endif %}
                               </div>
                       </div>
                   </div>
@@ -85,7 +89,44 @@
           </div>
               {%endif%}
                 
-              
+             {% if tipo == 'Visitante' %}
+              <div class="col-12 col-md-6">
+              <div class="card">
+              <div class="card-header">Mi actividad</div>
+    <div class="card-body p-0">
+
+        <div class="d-flex justify-content-around p-3 border-bottom text-center">
+            <div>
+                <p class="mb-0" style="font-size:20px; font-weight:600; color:var(--ft-primary);">{{ total_resenias }}</p>
+                <p class="mb-0" style="font-size:11px; color:var(--ft-muted);">Reseñas escritas</p>
+            </div>
+            <div>
+                <p class="mb-0" style="font-size:20px; font-weight:600; color:var(--ft-primary);">{{ promedio_calificacion|floatformat:1 }}</p>
+                <p class="mb-0" style="font-size:11px; color:var(--ft-muted);">Calificación promedio</p>
+            </div>
+        </div>
+
+        <div class="p-3 pb-2">
+            <p class="mb-0" style="font-size:12px; font-weight:600; color:var(--ft-muted);">PRÓXIMAS FERIAS</p>
+        </div>
+
+        {% for feria in proximas_ferias %}
+            <div class="d-flex justify-content-between align-items-center p-3 border-bottom">
+                <div>
+                    <p class="mb-0" style="font-size:13px; font-weight:500;">{{ feria.nombre }}</p>
+                    <p class="mb-0" style="font-size:11px; color:var(--ft-muted);">{{ feria.fecha_inicio }} — {{ feria.fecha_fin }}</p>
+                </div>
+                <a href="{% url 'ferias:detalle_feria' feria.pk %}" class="btn btn-sm btn-feria-dark">Ver</a>
+            </div>
+        {% empty %}
+            <div class="text-center p-4" style="color: var(--ft-muted);">
+                <p class="mb-0" style="font-size:13px;">No hay ferias próximas por el momento.</p>
+            </div>
+        {% endfor %}
+
+    </div>
+              </div>
+              {% endif%}
           
 </div>
 
@@ -142,6 +183,11 @@
 
                             <p class="mb-0 mt-1" style="font-size:12px; color: var(--ft-muted);">{{ resenia.comentario }}</p>
                           </div>
+                      </div>
+                      {% empty %}
+                      <div class="text-center p-4" style="color: var(--ft-muted);">
+                      <p class="mb-1">Todavía no dejaste ninguna reseña.</p>
+                       <small>Cuando visites una feria, vas a poder calificarla acá.</small>
                       </div>
                 {% endfor %}
               {%endif%}

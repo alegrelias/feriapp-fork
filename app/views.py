@@ -53,6 +53,7 @@ class PerfilView(LoginRequiredMixin,TemplateView):
         context = super().get_context_data(**kwargs)
         emprendedor = None
         visitante = None
+        
         context["inscripciones_a_evaluar"] = Inscripcion.objects.filter(estado__in=["Lista_espera", "Confirmada"])
         try:
             emprendedor = self.request.user.emprendedor  #  acceder al emprendedor
@@ -75,9 +76,16 @@ class PerfilView(LoginRequiredMixin,TemplateView):
             context["tipo"] = "Emprendedor"
 
         elif visitante:
-            context["resenias"] = visitante.resenias.select_related('feria')
+            
+            resenias=visitante.resenias.select_related('feria')
+            context["resenias"] = resenias
+            promedio_calificacion = resenias.aggregate(promedio=Avg('calificacion'))['promedio'] or 0
+            context['total_resenias'] = resenias.count()
+            context["promedio_calificacion"] = promedio_calificacion
             context["perfil"] = visitante
             context["tipo"] = "Visitante"
+            proximas_ferias = Feria.objects.filter(fecha_inicio__gte=date.today()).order_by('fecha_inicio')[:3]
+            context["proximas_ferias"] = proximas_ferias
         else:
              context["perfil"] = perfil
 
@@ -192,7 +200,7 @@ class EmprendedoresListView(LoginRequiredMixin, ListView):
 # TODO: implementar las siguientes vistas:
 # class NuevaFeriaView(CreateView): ...
 
-class NuevaFeriaView(PermissionRequiredMixin,SuccessMessageMixin, CreateView):
+class NuevaFeriaView(LoginRequiredMixin,PermissionRequiredMixin,SuccessMessageMixin, CreateView):
 
     template_name = "ferias/nueva_feria.html"
     form_class = FeriaForm
@@ -344,7 +352,7 @@ class CancelarInscripcionView(LoginRequiredMixin, UserPassesTestMixin, View):
         return Inscripcion.objects.get(pk=inscripcion_id)
 
 
-class AprobarInscripcionView(PermissionRequiredMixin, View):
+class AprobarInscripcionView(LoginRequiredMixin,PermissionRequiredMixin, View):
      # View es la clase base más genérica de Django, no sabe nada de formularios
     # No tiene get_form(), no tiene form_class, no tiene form_valid()
     permission_required = 'app.change_inscripcion'
