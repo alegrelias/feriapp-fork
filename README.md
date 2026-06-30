@@ -150,20 +150,67 @@ feriapp/
 
 ---
 
-## 🖼️ Capturas
+## Capturas
 
 ### Inicio
-![Pantalla de inicio](docs/screenshots/inicio.png)
+Siguiendo buenas prácticas el diseño es mobile first.
+
+<table>
+<tr>
+<td align="center"><b>Mobile</b></td>
+<td align="center"><b>Escritorio</b></td>
+</tr>
+<tr>
+<td><img width="280" alt="Vista mobile del inicio" src="https://github.com/user-attachments/assets/6e053610-be83-4dc2-a583-c58c44db08d8" /></td>
+<td><img width="500" alt="Vista escritorio del inicio" src="https://github.com/user-attachments/assets/d8c48051-8f02-4220-b95a-a46b140d4bd3" /></td>
+</tr>
+</table>
+
+---
 
 ### Detalle de feria
-![Detalle de feria](docs/screenshots/feria_detalle.png)
+Cada feria posee una ficha con descripciones, permiten la inscripción de emprendedores o la reseña de cada visitante en la feria.
+
+<img width="450" alt="Detalle de feria" src="https://github.com/user-attachments/assets/443b231c-c506-4528-a903-cdab6eb8ccbf" />
+
+---
 
 ### Panel de administración
-![Admin](docs/screenshots/admin.png)
 
-### Login
-![Login](docs/screenshots/login.png)
+<img width="600" alt="Panel de administración" src="https://github.com/user-attachments/assets/1b65029d-0c15-4e10-bb8f-569f806a5a4f" />
 
+---
+
+###  Perfil
+Vistas de perfil diferenciadas según tipo de usuario. El emprendedor tiene detalle de actividad más sus inscripciones, con posibilidad de cancelarlas. El visitante puede visualizar sus reseñas. Emprendedor con permisos de organizador puede aprobar o cancelar inscripciones
+
+<table>
+<tr>
+<td align="center"><b>Perfil Emprendedor</b></td>
+<td align="center"><b>Perfil Visitante</td></b></td>
+<td align="center"><b>Emprendedor con permisos de organizador</b></td>
+  </tr>
+<tr>
+<td><img width="280" alt="Perfil de emprendedor" src="https://github.com/user-attachments/assets/b886070a-d49d-405b-a9f1-8d614bd3bcdf" /></td>
+  <td><img width="280"  alt="image" src="https://github.com/user-attachments/assets/6016046d-81d2-40d6-a8c8-606bb02aeb8e" />
+</td>
+  <td><img width="280"  alt="image" src="https://github.com/user-attachments/assets/8c1d3647-569a-4f2c-a3ad-781738e4cbba" />
+</td>
+</tr>
+</table>
+
+---
+
+### Login 
+
+<table>
+<tr>
+<td align="center"><b>Login</b></td>
+</tr>
+<tr>
+<td><img width="280" alt="Login" src="https://github.com/user-attachments/assets/3ac9be97-f7d9-4cbb-999f-32a1b15cff31" /></td>
+  </tr>
+</table>
 ---
 
 ## 🧩 Decisiones de diseño
@@ -229,11 +276,13 @@ Nuestro objetivo fue construir una aplicación mantenible y coherente. La incorp
 
 ## ⭐ Funcionalidades opcionales implementadas
 
-- [ ] Vista "Mis inscripciones" para el emprendedor autenticado
-- [ ] Mensajes flash con `django.contrib.messages`
+[🟪 ✔] Vista "Mis inscripciones" para el emprendedor autenticado
+
+[🟪 ✔] Mensajes flash con `django.contrib.messages`
 - [ ] Paginación en lista de ferias
 - [ ] Barra de búsqueda por nombre o ubicación
-- [ ] Permisos diferenciados (Organizador vs. Emprendedor)
+      
+[ 🟪 ✔] Permisos diferenciados (Organizador vs. Emprendedor)
 - [ ] Tests de integración (flujo completo)
 
 ---
