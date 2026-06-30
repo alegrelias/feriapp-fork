@@ -205,7 +205,7 @@ El desarrollo del proyecto se organizó distribuyendo las principales responsabi
 Arquitectura de autenticación y administración: implementación del registro, inicio y cierre de sesión de usuarios, /navegación dinámica según el estado de autenticación y configuración del panel de administración de Django.
 Consultas y vistas de información: desarrollo de la página principal con estadísticas generales, listado de ferias con filtro por categorías, listado de emprendedores y perfil de usuario.
 Gestión de ferias: implementación del detalle de cada feria, mostrando la información general, los emprendedores inscriptos y el porcentaje de ocupación de puestos, además del formulario para crear nuevas ferias.
-Gestión de inscripciones: desarrollo del proceso de inscripción de emprendedores a una feria, visualización de las inscripciones realizadas, cancelación de inscripciones y sistema de reseñas de los asistentes.
+Gestión de inscripciones: desarrollo del proceso de inscripción de emprendedores a una feria, visualización de las inscripciones realizadas, cancelación de inscripciones y sistema de reseñas.
 
 Aunque inicialmente existió una división de actividades, varias decisiones se tomaron en conjunto. Entre ellas, la creación de la clase abstracta ValidableModel para reutilizar la lógica de validación y persistencia, la definición de las reglas de negocio de las inscripciones, el modelado de la disponibilidad de puestos y la organización general de la arquitectura del proyecto. En relación a lo dicho, esto nos permitió mantener un criterio común durante todo el desarrollo y facilitar la integración del trabajo realizado por cada integrante.
 
