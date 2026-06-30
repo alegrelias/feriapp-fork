@@ -526,13 +526,14 @@ class EmprendedorModelTest(TestCase):
 
     # --- new ---
     def test_new_crea_emprendedor_con_datos_validos(self):
+        user2 = User.objects.create_user(username="juanperez", email="jperez2@gmail.com")
         emprendedor, errors = Emprendedor.new(
             nombre="Juan",
             apellido="Perez",
             email="jperez@gmail.com",
             rubro=self.categoria,
             telefono="+54 2901 112233",
-            usuario=self.user
+            usuario=user2
         )
         self.assertEqual(errors, [])
         self.assertIsNotNone(emprendedor)
@@ -642,11 +643,12 @@ class VisitanteModelTest(TestCase):
 
     # --- new ---
     def test_new_crea_visitante_con_datos_validos(self):
+        user2 = User.objects.create_user(username="juanperez_vis", email="jperez2@gmail.com")
         visitante, errors = Visitante.new(
             nombre="Juan",
             apellido="Perez",
             email="jperez@gmail.com",
-            usuario=self.user,
+            usuario=user2,
             fecha_registro=date(2026, 9, 1)
         )
         self.assertEqual(errors, [])
@@ -887,7 +889,7 @@ class InscripcionModelTest(TestCase):
         Caso A: Valida que el sistema PROHÍBA asignar un puesto
         que ya está ocupado por otra inscripción confirmada.
         """
-        # 1. Creamos la primera inscripción confirmada en el puesto 5
+    # 1. Creamos la primera inscripción confirmada en el puesto 5
         Inscripcion.objects.create(
             emprendedor=self.emprendedor,
             feria=self.feria,
@@ -896,18 +898,23 @@ class InscripcionModelTest(TestCase):
             registrado_por="admin"
         )
 
-        # 2. Creamos una segunda inscripción en lista de espera
+        # 2. Creamos OTRO emprendedor distinto, con su propia inscripción en lista de espera
+        user2 = User.objects.create_user(username="otro_emp", email="otro_emp@gmail.com")
+        emprendedor2 = Emprendedor.objects.create(
+            nombre="Pedro", apellido="Lopez", email="plopez2@gmail.com",
+            rubro=self.categoria, telefono="+54-2901 000000", usuario=user2
+        )
         inscripcion_2 = Inscripcion.objects.create(
-            emprendedor=self.emprendedor,
+            emprendedor=emprendedor2,
             feria=self.feria,
             estado="Lista_espera",
             registrado_por="admin"
         )
 
-        # 3. Intentamos actualizar la segunda inscripción al mismo puesto 5
+        # 3. Intentamos confirmar la segunda inscripción en el mismo puesto 5
         errors = inscripcion_2.update(estado="Confirmada", numero_puesto=5)
 
-        # 4. Verificación: La lista de errores NO debe estar vacía
+        # 4. Verificación
         self.assertTrue(len(errors) > 0, "El sistema debió rechazar el puesto duplicado")
         self.assertIn("ya se encuentra ocupado en esta feria", errors[0])
 

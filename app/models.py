@@ -411,7 +411,7 @@ class Inscripcion(ValidableModel):
         registrado_por = models.CharField(max_length=100)
 
         #vinculo el manager
-
+        objects = InscripcionManager()
         class Meta:
             #para el panel de admin
             verbose_name_plural = "Inscripciones"
@@ -474,10 +474,15 @@ class Inscripcion(ValidableModel):
             estado_efectivo = estado_enviado or "Lista_espera"
             instancia_id = kwargs.get("instancia_id", None)
 
-            if Inscripcion.objects.filter(
+            duplicados = Inscripcion.objects.filter(
                 emprendedor=emprendedor,
                 feria=feria
-                ).exclude(estado="Cancelada").exists():
+            ).exclude(estado="Cancelada")
+
+            if instancia_id is not None:
+                duplicados = duplicados.exclude(id=instancia_id)
+
+            if duplicados.exists():
                 errors.append("Ya existe una inscripcion para este emprendedor en esta feria")
 
             if numero_puesto is not None :
@@ -486,14 +491,9 @@ class Inscripcion(ValidableModel):
                     errors.append("El número de puesto debe ser un entero positivo.")
                 if int (numero_puesto) > feria.capacidad_puestos:
                     errors.append(f"El número de puesto no puede ser mayor a la capacidad de la feria ({feria.capacidad_puestos}).")
-                # Validar consistencia con el estado
-                if estado_enviado is None:
-                    # Caso A: El usuario no especificó estado pero metió un número de puesto
-                    errors.append("No se puede asignar un número de puesto si la inscripción no está en estado 'Confirmada'.")
-                elif estado_efectivo in ["Cancelada"]:
-                    # Caso B: El usuario explícitamente eligió un estado inválido para tener puesto
+                 # Validar consistencia con el estado: solo Confirmada puede tener puesto
+                if estado_efectivo != "Confirmada":
                     errors.append(f"No se puede asignar un número de puesto a una inscripción con estado '{estado_efectivo}'.")
-
            
 
             if estado_efectivo == "Confirmada" and not numero_puesto :
