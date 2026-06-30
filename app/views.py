@@ -337,9 +337,9 @@ class CancelarInscripcionView(LoginRequiredMixin, UserPassesTestMixin, View):
         if not hasattr(self.request.user, 'emprendedor'):
             return user.has_perm('app.change_inscripcion')
       
-    
-
-        return inscripcion.emprendedor == self.request.user.emprendedor
+        es_dueño_inscripcion = inscripcion.emprendedor == self.request.user.emprendedor
+        tiene_permisos = user.has_perm('app.change_inscripcion')
+        return es_dueño_inscripcion or tiene_permisos
 
     def handle_no_permission(self):
         messages.error(self.request, "No tenés permiso para cancelar una inscripción que no es tuya.")
