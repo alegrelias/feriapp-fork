@@ -62,18 +62,20 @@
 
       <div class="col-12 col-md-3 ">
          <div class="card stat-card c2">
-          <div class="card-body">
+          <div class="card-body"><a href="{% url 'ferias:lista_emprendedores' %}">
             <p class="stat-num">{{ total_emprendedores }}</p>
             <p class="stat-label">👥 Emprendedores</p>
+            </a>
           </div>
         </div>
       </div>
 
       <div class="col-12 col-md-3">
          <div class="card stat-card c3">
-          <div class="card-body">
+          <div class="card-body"><a href="{% url 'ferias:lista_ferias' %}">
             <p class="stat-num">{{ ferias_proximas}}</p>
             <p class="stat-label">📅 Proximas ferias</p>
+            </a>
           </div>
         </div>
       </div>

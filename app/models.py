@@ -480,7 +480,7 @@ class Inscripcion(ValidableModel):
                 ).exclude(estado="Cancelada").exists():
                 errors.append("Ya existe una inscripcion para este emprendedor en esta feria")
 
-            if numero_puesto is not None:
+            if numero_puesto is not None :
                 # Validar que sea un número válido
                 if int(numero_puesto) <= 0:
                     errors.append("El número de puesto debe ser un entero positivo.")
@@ -493,6 +493,8 @@ class Inscripcion(ValidableModel):
                 elif estado_efectivo in ["Cancelada"]:
                     # Caso B: El usuario explícitamente eligió un estado inválido para tener puesto
                     errors.append(f"No se puede asignar un número de puesto a una inscripción con estado '{estado_efectivo}'.")
+
+           
 
             if estado_efectivo == "Confirmada" and not numero_puesto:
                 errors.append("Las inscripciones aceptadas deben tener un número de puesto asignado.")

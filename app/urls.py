@@ -6,6 +6,7 @@ from django.contrib.auth import views as auth_views
 
 app_name = "ferias"
 
+
 urlpatterns = [
     path("", views.HomeView.as_view(), name="home"),
     path("ferias/", views.FeriasListView.as_view(), name="lista_ferias"),

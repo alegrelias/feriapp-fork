@@ -46,32 +46,32 @@ class InscripcionForm(forms.ModelForm):
         widgets = {
             'emprendedor': forms.Select(attrs={'class': 'form-select'}),
             'feria': forms.Select(attrs={'class': 'form-select'}),
-            'numero_puesto': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Ej: 14'}),
+            'numero_puesto': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Al confirmar se le asignará numero de puesto'}),
             'estado': forms.Select(attrs={'class': 'form-select'}),
             'registrado_por': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Nombre del operador'}),
         }
 
     def __init__(self, *args, **kwargs):
-        feria_id = kwargs.pop('feria', None)
-        emprendedor_id = kwargs.pop('emprendedor', None)
+        self.feria_id = kwargs.pop('feria', None)
+        self.emprendedor_id = kwargs.pop('emprendedor', None)
 
         super().__init__(*args, **kwargs)
 
 
-        if feria_id and 'feria' in self.fields:
-            self.initial['feria'] = feria_id
+       
 
-        if emprendedor_id and 'emprendedor' in self.fields:
-            self.initial['emprendedor'] = emprendedor_id
+     
+        
+        if self.feria_id and 'feria' in self.fields:
+            self.initial['feria'] = self.feria_id
+
+        if self.emprendedor_id and 'emprendedor' in self.fields:
+            self.initial['emprendedor'] = self.emprendedor_id
 
         #aplicamos estilos y bloqueos
         for field_name, field in self.fields.items():
-            if field_name == 'numero_puesto':
-                field.widget.attrs.update({
-                    'class': 'form-control',
-                    'placeholder': 'Ej: 14'
-                })
-            elif field_name == 'registrado_por':
+           
+            if field_name == 'registrado_por':
                 field.widget.attrs.update({
                     'class': 'form-control',
                     'placeholder': 'Ej: Juan Pérez'
@@ -84,7 +84,27 @@ class InscripcionForm(forms.ModelForm):
                     'tabindex': '-1' #evita que el usuario llegue al campo usando la tecla TAB
                 })
 
+    def clean(self):
+            cleaned_data = super().clean()
+            numero_puesto = cleaned_data.get('numero_puesto')
+            registrado_por = cleaned_data.get('registrado_por')
 
+            
+                
+                # Llamada al validador del modelo
+            errors = Inscripcion.validate(
+                    emprendedor=self.emprendedor_id,
+                    feria=self.feria_id,
+                    numero_puesto=numero_puesto,
+                    registrado_por=registrado_por,
+                    estado='Lista_espera'
+            )
+                
+            if errors:
+                    # Si 'errors' es un string o lista, lo asignamos como error global del formulario
+                raise forms.ValidationError(errors)
+                    
+            return cleaned_data
 class RegistroEmprendedorForm(UserCreationForm):
     #forms.CharField → crea un <input type="text"> en el HTML y valida que no supere el max_length
     nombre = forms.CharField(

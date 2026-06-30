@@ -298,10 +298,8 @@ class NuevaInscripcionView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
         inscripcion = form.save(commit=False)
         inscripcion.feria = Feria.objects.filter(pk=self.kwargs["pk"]).first()
         inscripcion.emprendedor = self.request.user.emprendedor
-        inscripcion.registrado_por = self.request.user.emprendedor.nombre + " " + self.request.user.emprendedor.apellido
-
         inscripcion.estado = 'Lista_espera' #choice por defecto
-
+        
         inscripcion.save()
 
         messages.success(self.request, "Tu inscripción se ha registrado con éxito.")
