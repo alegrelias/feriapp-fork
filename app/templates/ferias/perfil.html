@@ -58,14 +58,21 @@
 
                   {% if inscripcion.estado == "Confirmada" %}
                     <div class="badge badge-feria activa" >Confirmada</div>
-                      <form action ="{% url 'ferias:cancelar_inscripcion' inscripcion.pk %}" method="post" class="display:inline;">
+                      <form action ="{% url 'ferias:cancelar_inscripcion' inscripcion.pk %}" method="post" style="display:inline;">
                       {% csrf_token %}
                       <button type="submit" class="btn  btn-feria-warning btn-sm m-1">Cancelar inscripcion</button>
                       </form>
                       {% elif inscripcion.estado == "Lista_espera"%}
                       <div class="badge badge-feria espera" >En lista de espera</div> 
-                      <form action ="{% url 'ferias:aprobar_inscripcion' inscripcion.pk %}" method="post" class="display:inline;">
+                      <form action ="{% url 'ferias:aprobar_inscripcion' inscripcion.pk %}" method="post" style="display:inline;" class="d-flex flex-column align-items-center g-2">
                       {% csrf_token %}
+                       <input type="number"
+                        name="numero_puesto" 
+                        min="1"
+                        class="form-control form-control-sm"
+                        style="width: 120px;"
+                        placeholder="N° puesto"
+                        required>
                       <button type="submit" class="btn realizada btn-sm m-1">Aprobar inscripcion</button>
                       </form>
                       {% else %}

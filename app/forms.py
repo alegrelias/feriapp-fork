@@ -52,6 +52,7 @@ class InscripcionForm(forms.ModelForm):
         }
 
     def __init__(self, *args, **kwargs):
+        #con self quedan como atributos de clase
         self.feria_id = kwargs.pop('feria', None)
         self.emprendedor_id = kwargs.pop('emprendedor', None)
 
@@ -60,7 +61,7 @@ class InscripcionForm(forms.ModelForm):
 
        
 
-     
+
         
         if self.feria_id and 'feria' in self.fields:
             self.initial['feria'] = self.feria_id
@@ -105,6 +106,12 @@ class InscripcionForm(forms.ModelForm):
                 raise forms.ValidationError(errors)
                     
             return cleaned_data
+    
+class ConfirmarInscripcionForm(forms.Form):
+    numero_puesto = forms.IntegerField(
+        min_value=1,
+        widget=forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Ej: 14'})
+    )
 class RegistroEmprendedorForm(UserCreationForm):
     #forms.CharField → crea un <input type="text"> en el HTML y valida que no supere el max_length
     nombre = forms.CharField(

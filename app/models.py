@@ -496,7 +496,7 @@ class Inscripcion(ValidableModel):
 
            
 
-            if estado_efectivo == "Confirmada" and not numero_puesto:
+            if estado_efectivo == "Confirmada" and not numero_puesto :
                 errors.append("Las inscripciones aceptadas deben tener un número de puesto asignado.")
             # --- VALIDACIÓN DE PUESTO DUPLICADO ---
             if estado_efectivo == "Confirmada":
@@ -517,7 +517,7 @@ class Inscripcion(ValidableModel):
             """Sobreescribo el metodo porque igual hay que tener en cuenta casos propios de la instancia del modelo"""
             errors = []
 
-
+          
 
 
             if "emprendedor" in kwargs and self.emprendedor != kwargs["emprendedor"]:
@@ -551,6 +551,8 @@ class Inscripcion(ValidableModel):
             kwargs.setdefault("registrado_por", self.registrado_por)
             kwargs.setdefault("estado", self.estado)
             kwargs['instancia_id'] = self.id
+
+           
 
             return super().update(**kwargs)
 

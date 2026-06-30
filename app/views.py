@@ -11,7 +11,7 @@ from .models import Feria, Emprendedor,Inscripcion,Categoria,Resenia,Visitante
 from datetime import date
 from django.shortcuts import redirect, get_object_or_404
 from django.http import HttpResponseRedirect
-from .forms import FeriaForm, RegistroEmprendedorForm,RegistroVisitanteForm
+from .forms import FeriaForm, RegistroEmprendedorForm,RegistroVisitanteForm, ConfirmarInscripcionForm
 from .forms import InscripcionForm
 from django.contrib import messages
 from django.db import transaction
@@ -328,9 +328,15 @@ class CancelarInscripcionView(LoginRequiredMixin, UserPassesTestMixin, View):
 
     def post(self, request, *args, **kwargs):
         inscripcion = get_object_or_404(Inscripcion, pk=self.kwargs.get('pk'))
-        inscripcion.estado = "Cancelada"
-        inscripcion.save()
-        messages.success(self.request, "Inscripción cancelada exitosamente.")
+       
+        errors = inscripcion.update(
+        estado='Confirmada',
+        )
+        if errors:
+            for e in errors:
+                messages.error(request, e)
+        else:
+            messages.success(request, "Inscripción cancelada.")
         return redirect(self.success_url)
 
     def get_object(self, queryset=None):
@@ -339,16 +345,30 @@ class CancelarInscripcionView(LoginRequiredMixin, UserPassesTestMixin, View):
 
 
 class AprobarInscripcionView(PermissionRequiredMixin, View):
+     # View es la clase base más genérica de Django, no sabe nada de formularios
+    # No tiene get_form(), no tiene form_class, no tiene form_valid()
     permission_required = 'app.change_inscripcion'
    
 
     def post(self, request, *args, **kwargs):
-        # Tomamos el ID de la URL o del POST
         inscripcion = get_object_or_404(Inscripcion, pk=self.kwargs['pk'])
-        inscripcion.estado = 'Confirmada'
-        inscripcion.save()
+        numero_puesto = request.POST.get('numero_puesto')
+        form = ConfirmarInscripcionForm(request.POST)
+
+        if not form.is_valid():
+            messages.error(request, "Debe ingresar un número de puesto válido.")
+            return redirect('ferias:perfil')
         
-        messages.success(request, "Inscripción aprobada con éxito.")
-        # Te manda de vuelta al perfil de donde viniste
+        errors = inscripcion.update(
+        estado='Confirmada',
+        numero_puesto=numero_puesto,
+        )
+
+        if errors:
+            for e in errors:
+                messages.error(request, e)
+        else:
+            messages.success(request, "Inscripción aprobada con éxito.")
+        # No necesito hacer save ya que la clase validable model ya lo realiza 
         return redirect('ferias:perfil')
 
