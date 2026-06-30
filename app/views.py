@@ -263,6 +263,7 @@ class NuevaInscripcionView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
     model = Inscripcion
     form_class = InscripcionForm
     template_name = 'ferias/nueva_inscripcion.html'
+    success_url = reverse_lazy('ferias:lista_ferias')
 
     def test_func(self):
 
@@ -278,20 +279,31 @@ class NuevaInscripcionView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
 
         return redirect("ferias:lista_ferias")
 
-    def form_valid(self, form):
-        inscripcion = form.save(commit=False)  # crea el objeto pero NO lo guarda todavía
-        inscripcion.feria = Feria.objects.get(pk=self.kwargs["pk"])
-        inscripcion.emprendedor = self.request.user.emprendedor
-        inscripcion.registrado_por = inscripcion.emprendedor
-        errors = Inscripcion.validate(emprendedor=inscripcion.emprendedor, feria=inscripcion.feria,
-        numero_puesto=inscripcion.numero_puesto, registrado_por=inscripcion.registrado_por, estado=inscripcion.estado)
-        if errors:
-            form.add_error(None, errors)
-            return self.form_invalid(form)
-        inscripcion.save()                     # ahora sí se guarda
-        messages.success(self.request, "Tu inscripción se encuentra en lista de espera. Cuando sea confirmada, recibirás un correo electrónico con la información correspondiente.")
+    def get_form_kwargs(self):
+        """
+        Este método empaqueta los datos que se le enviarán al init del formulario.
+        """
+        kwargs = super().get_form_kwargs()
+        kwargs['feria'] = Feria.objects.filter(pk=self.kwargs["pk"]).first()
+        kwargs['emprendedor'] = self.request.user.emprendedor
+        return kwargs
 
-        return redirect("ferias:lista_ferias")  # redirigís a la lista de ferias
+    def form_valid(self, form):
+        """
+        Una vez que el formulario pasa la validación, asignamos los datos
+        reales a la instancia antes de guardarla en la base de datos.
+        """
+        inscripcion = form.save(commit=False)
+        inscripcion.feria = Feria.objects.filter(pk=self.kwargs["pk"]).first()
+        inscripcion.emprendedor = self.request.user.emprendedor
+        inscripcion.registrado_por = self.request.user.emprendedor.nombre + " " + self.request.user.emprendedor.apellido
+
+        inscripcion.estado = 'Lista_espera' #choice por defecto
+
+        inscripcion.save()
+
+        messages.success(self.request, "Tu inscripción se ha registrado con éxito.")
+        return super().form_valid(form)
 
 
 class CancelarInscripcionView(LoginRequiredMixin, UserPassesTestMixin, View):
